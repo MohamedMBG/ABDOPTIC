@@ -2823,20 +2823,25 @@ function submitContactForm(form) {
         data: data,
         success: function(result) {
             if (result.success == true) {
-                $('div.contact_modal').modal('hide');
-                toastr.success(result.msg);
+                if ($(form).attr('id') === 'contact_add_form') {
+                    var redirectType = $('#type').val() || 'customer';
+                    var base = typeof base_path !== 'undefined' ? base_path : '';
+                    window.location = base + '/contacts?type=' + redirectType;
+                } else {
+                    $('div.contact_modal').modal('hide');
+                    toastr.success(result.msg);
 
-                if (typeof(contact_table) != 'undefined') {
-                    contact_table.ajax.reload();
-                }
+                    if (typeof(contact_table) != 'undefined') {
+                        contact_table.ajax.reload();
+                    }
 
-                var lead_view = urlSearchParam('lead_view');
-                if (lead_view == 'kanban') {
-                    initializeLeadKanbanBoard();
-                } else if(lead_view == 'list_view' && typeof(leads_datatable) != 'undefined') {
-                    leads_datatable.ajax.reload();
+                    var lead_view = urlSearchParam('lead_view');
+                    if (lead_view == 'kanban') {
+                        initializeLeadKanbanBoard();
+                    } else if(lead_view == 'list_view' && typeof(leads_datatable) != 'undefined') {
+                        leads_datatable.ajax.reload();
+                    }
                 }
-                
             } else {
                 toastr.error(result.msg);
             }

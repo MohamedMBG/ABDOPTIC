@@ -24,7 +24,7 @@ class Contact extends Authenticatable
         'email', 'image', 'contact_id', 'contact_status', 'tax_number',
         'city', 'state', 'country', 'address_line_1', 'address_line_2',
         'zip_code', 'dob', 'mobile', 'landline', 'alternate_number',
-        'pay_term_number', 'pay_term_type', 'credit_limit', 'created_by',
+        'pay_term_number', 'pay_term_type', 'credit_limit', 'amount_received', 'amount_owed', 'created_by',
         'balance', 'total_rp', 'total_rp_used', 'total_rp_expired',
         'is_default', 'shipping_address', 'shipping_custom_field_details',
         'is_export', 'export_custom_field_1', 'export_custom_field_2',

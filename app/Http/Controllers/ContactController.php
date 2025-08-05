@@ -598,6 +598,8 @@ class ContactController extends Controller
             'first_name' => 'required',
             'type' => 'required',
             'mobile' => 'required',
+            'amount_received' => 'nullable|numeric',
+            'amount_owed' => 'nullable|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -608,8 +610,8 @@ class ContactController extends Controller
             'city', 'state', 'country', 'address_line_1', 'address_line_2', 'customer_group_id', 
             'zip_code', 'contact_id', 'custom_field1', 'custom_field2', 'custom_field3', 'custom_field4', 
             'custom_field5', 'custom_field6', 'custom_field7', 'custom_field8', 'custom_field9', 
-            'custom_field10', 'email', 'shipping_address', 'position', 'dob', 'shipping_custom_field_details', 
-            'assigned_to_users'
+            'custom_field10', 'email', 'shipping_address', 'position', 'dob', 'shipping_custom_field_details',
+            'assigned_to_users', 'amount_received', 'amount_owed'
         ]);
 
 
@@ -661,11 +663,13 @@ class ContactController extends Controller
         $input['created_by'] = $request->session()->get('user.id');
 
         // Format financial fields
-        $input['credit_limit'] = $request->filled('credit_limit') 
-            ? $this->commonUtil->num_uf($request->input('credit_limit')) 
+        $input['credit_limit'] = $request->filled('credit_limit')
+            ? $this->commonUtil->num_uf($request->input('credit_limit'))
             : null;
 
         $input['opening_balance'] = $this->commonUtil->num_uf($request->input('opening_balance'));
+        $input['amount_received'] = $this->commonUtil->num_uf($request->input('amount_received', 0));
+        $input['amount_owed'] = $this->commonUtil->num_uf($request->input('amount_owed', 0));
 
         DB::beginTransaction();
 
@@ -686,7 +690,12 @@ class ContactController extends Controller
 
         DB::commit();
 
-        return $output;
+        if ($request->ajax()) {
+            return $output;
+        }
+
+        return redirect()->action([ContactController::class, 'index'], ['type' => $input['type']])
+            ->with('status', $output);
 
     } catch (\Exception $e) {
         DB::rollBack();
@@ -849,7 +858,7 @@ class ContactController extends Controller
                 'custom_field9', 'custom_field10', 'email', 'shipping_address', 'position',
                 'shipping_custom_field_details', 'export_custom_field_1', 'export_custom_field_2',
                 'export_custom_field_3', 'export_custom_field_4', 'export_custom_field_5',
-                'export_custom_field_6', 'assigned_to_users'
+                'export_custom_field_6', 'assigned_to_users', 'amount_received', 'amount_owed'
             ]);
 
             // Handle Image Upload
@@ -910,11 +919,13 @@ class ContactController extends Controller
             }
 
             // Format financial fields
-            $input['credit_limit'] = $request->input('credit_limit') != '' 
-                ? $this->commonUtil->num_uf($request->input('credit_limit')) 
+            $input['credit_limit'] = $request->input('credit_limit') != ''
+                ? $this->commonUtil->num_uf($request->input('credit_limit'))
                 : null;
 
             $input['opening_balance'] = $this->commonUtil->num_uf($request->input('opening_balance'));
+            $input['amount_received'] = $this->commonUtil->num_uf($request->input('amount_received', 0));
+            $input['amount_owed'] = $this->commonUtil->num_uf($request->input('amount_owed', 0));
 
             // Check subscription
             if (!$this->moduleUtil->isSubscribed($business_id)) {

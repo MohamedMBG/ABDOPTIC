@@ -178,6 +178,14 @@
                         {!! Form::number('opening_balance', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
                     </div>
                     <div class="form-group">
+                        <label for="amount_received"><i class="fa fa-money text-muted"></i> Amount Received:</label>
+                        {!! Form::number('amount_received', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
+                    </div>
+                    <div class="form-group">
+                        <label for="amount_owed"><i class="fa fa-money text-muted"></i> Amount Owed:</label>
+                        {!! Form::number('amount_owed', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
+                    </div>
+                    <div class="form-group">
                         <label for="pay_term"><i class="fa fa-calendar text-muted"></i> Pay Term:</label>
                         <div class="row pay-term-row align-items-end">
                             <div class="col-md-6 pe-2">

@@ -295,6 +295,32 @@
           </div>
         </div>
 
+        <div class="col-md-4">
+          <div class="form-group">
+              {!! Form::label('amount_received', 'Amount Received:' ) !!}
+              <div class="input-group">
+                  <span class="input-group-addon">
+                      <i class="fas fa-money-bill-alt"></i>
+                  </span>
+                  {!! Form::text('amount_received', $contact->amount_received, ['class' => 'form-control input_number']); !!}
+              </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+              {!! Form::label('amount_owed', 'Amount Owed:' ) !!}
+              <div class="input-group">
+                  <span class="input-group-addon">
+                      <i class="fas fa-money-bill-alt"></i>
+                  </span>
+                  {!! Form::text('amount_owed', $contact->amount_owed, ['class' => 'form-control input_number']); !!}
+              </div>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
         <div class="col-md-4 pay_term">
           <div class="form-group">
             <div class="multi-input">
