@@ -670,7 +670,9 @@ class ContactController extends Controller
         $input['opening_balance'] = $this->commonUtil->num_uf($request->input('opening_balance'));
         $input['amount_received'] = $this->commonUtil->num_uf($request->input('amount_received', 0));
         $input['amount_owed'] = $this->commonUtil->num_uf($request->input('amount_owed', 0));
-
+        //set balance as difference between received and owed
+        $input['balance'] = $input['amount_received'] - $input['amount_owed'];
+        
         DB::beginTransaction();
 
         // Create contact
@@ -926,7 +928,8 @@ class ContactController extends Controller
             $input['opening_balance'] = $this->commonUtil->num_uf($request->input('opening_balance'));
             $input['amount_received'] = $this->commonUtil->num_uf($request->input('amount_received', 0));
             $input['amount_owed'] = $this->commonUtil->num_uf($request->input('amount_owed', 0));
-
+            $input['balance'] = $input['amount_received'] - $input['amount_owed'];
+            
             // Check subscription
             if (!$this->moduleUtil->isSubscribed($business_id)) {
                 return $this->moduleUtil->expiredResponse();
