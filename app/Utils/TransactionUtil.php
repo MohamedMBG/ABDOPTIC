@@ -5213,6 +5213,8 @@ class TransactionUtil extends Util
         $beginning_balance = $total_prev_invoice - $total_prev_paid;
 
         $contact = Contact::find($contact_id);
+        $opening_amount_received = $contact->amount_received ?? 0;
+        $opening_amount_owed = $contact->amount_owed ?? 0;
 
         $with = ['location'];
         if ($line_details) {
@@ -5410,6 +5412,7 @@ class TransactionUtil extends Util
         $total_transactions_paid = $total_invoice_paid + $total_purchase_paid - $total_sell_return_paid - $total_purchase_return_paid;
 
         $curr_due = $total_invoice + $total_purchase - $total_transactions_paid + $beginning_balance + $opening_balance_due;
+        $curr_due += $opening_amount_owed - $opening_amount_received;
 
         //Sort by date
         if (! empty($ledger)) {
@@ -5507,6 +5510,7 @@ class TransactionUtil extends Util
 
         $total_overall_paid_supplier = $overall_total_purchase_paid - $overall_total_purchase_return_paid;
         $overall_due = $total_overall_invoice + $total_overall_purchase - $total_overall_paid_customer - $total_overall_paid_supplier - $overall_ledger_discount;
+        $overall_due += $opening_amount_owed - $opening_amount_received;
 
         $output = [
             'ledger' => $ledger,
@@ -5519,6 +5523,8 @@ class TransactionUtil extends Util
             'total_paid' => $total_paid,
             'total_reverse_payment' => $total_reverse_payment,
             'ledger_discount' => $ledger_discount,
+            'opening_amount_received' => $opening_amount_received,
+            'opening_amount_owed' => $opening_amount_owed,
 
             'all_total_invoice' => $total_overall_invoice,
             'all_invoice_paid' => $total_overall_paid_customer,

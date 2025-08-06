@@ -39,20 +39,32 @@
 			</tr>
 		@endif
 		@if( $contact->type == 'customer' || $contact->type == 'both')
-			<tr>
-				<td>@lang('lang_v1.total_invoice')</td>
-				<td class="align-right">@format_currency($ledger_details['total_invoice'])</td>
-			</tr>
-		@endif
-		<tr>
-			<td>@lang('sale.total_paid')</td>
-			<td class="align-right">@format_currency($ledger_details['total_paid'])</td>
-		</tr>
-		{{-- <tr class="summary_hidden">
-			<td>@lang('lang_v1.advance_balance')</td>
-			<td class="align-right">@format_currency($contact->balance - $ledger_details['total_reverse_payment'])</td>
-		</tr> --}}
-		@if($ledger_details['ledger_discount'] > 0)
+                        <tr>
+                                <td>@lang('lang_v1.total_invoice')</td>
+                                <td class="align-right">@format_currency($ledger_details['total_invoice'])</td>
+                        </tr>
+                @endif
+                <tr>
+                        <td>@lang('sale.total_paid')</td>
+                        <td class="align-right">@format_currency($ledger_details['total_paid'])</td>
+                </tr>
+                @if($ledger_details['opening_amount_received'] > 0)
+                        <tr>
+                                <td>@lang('lang_v1.amount_received')</td>
+                                <td class="align-right">@format_currency($ledger_details['opening_amount_received'])</td>
+                        </tr>
+                @endif
+                @if($ledger_details['opening_amount_owed'] > 0)
+                        <tr>
+                                <td>@lang('lang_v1.amount_owed')</td>
+                                <td class="align-right">@format_currency($ledger_details['opening_amount_owed'])</td>
+                        </tr>
+                @endif
+                {{-- <tr class="summary_hidden">
+                        <td>@lang('lang_v1.advance_balance')</td>
+                        <td class="align-right">@format_currency($contact->balance - $ledger_details['total_reverse_payment'])</td>
+                </tr> --}}
+                @if($ledger_details['ledger_discount'] > 0)
 			<tr>
 				<td>@lang('lang_v1.ledger_discount')</td>
 				<td class="align-right">@format_currency($ledger_details['ledger_discount'])</td>
@@ -97,12 +109,25 @@
                 </tr>
             @endif
 
-			<tr >
-				<td><strong>@lang('lang_v1.balance_due')</strong></td>
-				<td class="align-right">@format_currency($ledger_details['all_balance_due'])</td>
-			</tr>
-		</table>
-	</div>
+			@if($ledger_details['opening_amount_received'] > 0)
+                        <tr>
+                                <td>@lang('lang_v1.amount_received')</td>
+                                <td class="align-right">@format_currency($ledger_details['opening_amount_received'])</td>
+                        </tr>
+                @endif
+                @if($ledger_details['opening_amount_owed'] > 0)
+                        <tr>
+                                <td>@lang('lang_v1.amount_owed')</td>
+                                <td class="align-right">@format_currency($ledger_details['opening_amount_owed'])</td>
+                        </tr>
+                @endif
+
+                        <tr >
+                                <td><strong>@lang('lang_v1.balance_due')</strong></td>
+                                <td class="align-right">@format_currency($ledger_details['all_balance_due'])</td>
+                        </tr>
+                </table>
+        </div>
 </div>
 
 

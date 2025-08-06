@@ -1449,6 +1449,8 @@ return [
     'net' => 'Net',
     'net_home_tooltip' => 'NET = TOTAL SALES - INVOICE DUE - EXPENSE',
     'ledger_discount' => 'Ledger discount',
+    'amount_received' => 'Amount received',
+    'amount_owed' => 'Amount owed',
     'edit_discount' => 'Edit Discount',
     'discount_for' => 'Discount for',
     'delivery_at' => 'Delivery at',
