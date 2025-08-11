@@ -1433,6 +1433,8 @@ return [
     'over_90_days_past_due' => 'Over 90 days past due',
     'amount_due' => 'Amount due',
     'change_return_payment_method' => 'Change return payment method',
+    'amount_owed' => 'Amount Owed',
+    'amount_received' => 'Amount Received',
     'change_return_payment_account' => 'Change return payment account',
     'pay_to_supplier' => 'Debit (Pay to supplier)',
     'receive_from_supplier' => 'Credit (Receive from supplier)',

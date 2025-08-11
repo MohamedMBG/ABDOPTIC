@@ -907,6 +907,8 @@ return [
     'beginning_balance' => 'Solde de départ',
     'total_invoice' => 'Facture totale',
     'balance_due' => 'Solde dû',
+    'amount_owed' => 'Montant dû',
+    'amount_received' => 'Montant reçu',
     'send_ledger' => 'Envoyer Ledger',
     'notifications' => 'Notifications',
     'ledger_attacment_help' => 'Le grand livre sera joint au format PDF avec cet e-mail',

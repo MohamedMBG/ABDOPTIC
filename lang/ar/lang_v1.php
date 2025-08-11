@@ -917,6 +917,8 @@ return [
     'beginning_balance' => 'توازن بداية',
     'total_invoice' => 'إجمالي الفاتورة',
     'balance_due' => 'الرصيد المستحق',
+    'amount_owed' => 'المبلغ المستحق',
+    'amount_received' => 'المبلغ المستلم',
     'send_ledger' => 'إرسال دفتر الأستاذ',
     'notifications' => 'إشعارات',
     'ledger_attacment_help' => 'سيتم إرفاق دفتر الأستاذ بتنسيق PDF مع هذا البريد الإلكتروني',

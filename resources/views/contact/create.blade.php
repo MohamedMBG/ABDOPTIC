@@ -174,7 +174,7 @@
                         {!! Form::text('tax_number', null, ['class' => 'form-control', 'placeholder' => 'Tax number']) !!}
                     </div>
                     <div class="form-group">
-                        <label for="opening_balance"><i class="fa fa-money text-muted"></i> Opening Balance:</label>
+                        <label for="opening_balance"><i class="fa fa-money text-muted"></i> @lang('account.opening_balance'):</label>
                         {!! Form::number('opening_balance', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
                     </div>
                     <div class="form-group">
