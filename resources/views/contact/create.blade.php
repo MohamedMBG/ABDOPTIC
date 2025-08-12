@@ -174,15 +174,23 @@
                         {!! Form::text('tax_number', null, ['class' => 'form-control', 'placeholder' => 'Tax number']) !!}
                     </div>
                     <div class="form-group">
-                        <label for="opening_balance"><i class="fa fa-money text-muted"></i> @lang('account.opening_balance'):</label>
+                        <label for="opening_balance">
+                            <i class="fa fa-money text-muted"></i> @lang('account.opening_balance'):
+                        </label>
                         {!! Form::number('opening_balance', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
                     </div>
+
                     <div class="form-group">
-                        <label for="amount_received"><i class="fa fa-money text-muted"></i> Amount Received:</label>
+                        <label for="amount_received">
+                            <i class="fa fa-money text-muted"></i> @lang('lang_v1.amount_received'):
+                        </label>
                         {!! Form::number('amount_received', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
                     </div>
+
                     <div class="form-group">
-                        <label for="amount_owed"><i class="fa fa-money text-muted"></i> Amount Owed:</label>
+                        <label for="amount_owed">
+                            <i class="fa fa-money text-muted"></i> @lang('lang_v1.amount_owed'):
+                        </label>
                         {!! Form::number('amount_owed', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
                     </div>
                     <div class="form-group">
