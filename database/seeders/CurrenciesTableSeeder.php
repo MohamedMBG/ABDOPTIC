@@ -287,6 +287,7 @@ class CurrenciesTableSeeder extends Seeder
         Currency::insert($data);
 
         Currency::insert([
+            ['country' => 'Morocco', 'currency' => 'Moroccan dirham', 'code' => 'MAD', 'symbol' => 'MAD', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
             ['country' => 'Algerie', 'currency' => 'Algerian dinar', 'code' => 'DZD', 'symbol' => 'د.ج', 'thousand_separator' => ' ', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
             ['country' => 'United Arab Emirates', 'currency' => 'United Arab Emirates dirham', 'code' => 'AED', 'symbol' => 'د.إ', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
             ['country' => 'Uganda', 'currency' => 'Uganda shillings', 'code' => 'UGX', 'symbol' => 'USh', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
@@ -297,3 +298,4 @@ class CurrenciesTableSeeder extends Seeder
         ]);
     }
 }
+

@@ -446,7 +446,7 @@ class ProductController extends Controller
         }
         try {
             $business_id = $request->session()->get('user.business_id');
-            $form_fields = ['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'type', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_custom_field5', 'product_custom_field6', 'product_custom_field7', 'product_custom_field8', 'product_custom_field9', 'product_custom_field10', 'product_custom_field11', 'product_custom_field12', 'product_custom_field13', 'product_custom_field14', 'product_custom_field15', 'product_custom_field16', 'product_custom_field17', 'product_custom_field18', 'product_custom_field19', 'product_custom_field20',];
+            $form_fields = ['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'type', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_custom_field5', 'product_custom_field6', 'product_custom_field7', 'product_custom_field8', 'product_custom_field9', 'product_custom_field10', 'product_custom_field11', 'product_custom_field12', 'product_custom_field13', 'product_custom_field14', 'product_custom_field15', 'product_custom_field16', 'product_custom_field17', 'product_custom_field18', 'product_custom_field19', 'product_custom_field20', 'optical_product_type', 'frame_color', 'frame_eye_size', 'frame_bridge_size', 'frame_temple_length', 'lens_material', 'lens_coating', 'lens_type', 'lens_index'];
 
             $module_form_fields = $this->moduleUtil->getModuleFormField('product_form_fields');
             if (! empty($module_form_fields)) {
@@ -678,7 +678,7 @@ class ProductController extends Controller
 
         try {
             $business_id = $request->session()->get('user.business_id');
-            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_custom_field5', 'product_custom_field6', 'product_custom_field7', 'product_custom_field8', 'product_custom_field9', 'product_custom_field10', 'product_custom_field11', 'product_custom_field12', 'product_custom_field13', 'product_custom_field14', 'product_custom_field15', 'product_custom_field16', 'product_custom_field17', 'product_custom_field18', 'product_custom_field19', 'product_custom_field20',]);
+            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_custom_field5', 'product_custom_field6', 'product_custom_field7', 'product_custom_field8', 'product_custom_field9', 'product_custom_field10', 'product_custom_field11', 'product_custom_field12', 'product_custom_field13', 'product_custom_field14', 'product_custom_field15', 'product_custom_field16', 'product_custom_field17', 'product_custom_field18', 'product_custom_field19', 'product_custom_field20', 'optical_product_type', 'frame_color', 'frame_eye_size', 'frame_bridge_size', 'frame_temple_length', 'lens_material', 'lens_coating', 'lens_type', 'lens_index']);
 
             DB::beginTransaction();
 
@@ -724,6 +724,17 @@ class ProductController extends Controller
             $product->product_custom_field18 = $product_details['product_custom_field18'] ?? '';
             $product->product_custom_field19 = $product_details['product_custom_field19'] ?? '';
             $product->product_custom_field20 = $product_details['product_custom_field20'] ?? '';
+
+            $product->optical_product_type = $product_details['optical_product_type'] ?? null;
+            $product->frame_color = $product_details['frame_color'] ?? null;
+            $product->frame_eye_size = $product_details['frame_eye_size'] ?? null;
+            $product->frame_bridge_size = $product_details['frame_bridge_size'] ?? null;
+            $product->frame_temple_length = $product_details['frame_temple_length'] ?? null;
+            
+            $product->lens_material = $product_details['lens_material'] ?? null;
+            $product->lens_coating = $product_details['lens_coating'] ?? null;
+            $product->lens_type = $product_details['lens_type'] ?? null;
+            $product->lens_index = $product_details['lens_index'] ?? null;
 
             $product->product_description = $product_details['product_description'];
             $product->sub_unit_ids = ! empty($product_details['sub_unit_ids']) ? $product_details['sub_unit_ids'] : null;

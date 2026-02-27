@@ -57,7 +57,25 @@ class TransactionUtil extends Util
             $pay_term_number = $contact->pay_term_number;
             $pay_term_type = $contact->pay_term_type;
         }
+
+        // Check if optical products or prescription exists
+        $optician_status = null;
+        if (!empty($input['prescription_id'])) {
+           $optician_status = 'prescription_received';
+        } else if (!empty($input['products'])) {
+            $product_ids = array_column($input['products'], 'product_id');
+            $has_optical = \App\Product::whereIn('id', $product_ids)
+                ->where(function($q) {
+                    $q->whereNotNull('optical_product_type')->where('optical_product_type', '!=', '');
+                })->exists();
+            if ($has_optical) {
+                $optician_status = 'prescription_received';
+            }
+        }
+
         $transaction = Transaction::create([
+            'prescription_id' => !empty($input['prescription_id']) ? $input['prescription_id'] : null,
+            'optician_status' => $optician_status,
             'business_id' => $business_id,
             'location_id' => $input['location_id'],
             'type' => $sale_type,
@@ -189,7 +207,25 @@ class TransactionUtil extends Util
             $pay_term_type = $contact->pay_term_type;
         }
 
+        $optician_status = $transaction->optician_status;
+        $prescription_id = $transaction->prescription_id;
+        if (!empty($input['prescription_id'])) {
+           $optician_status = $optician_status ?: 'prescription_received';
+           $prescription_id = $input['prescription_id'];
+        } else if (!empty($input['products']) && empty($optician_status)) {
+            $product_ids = array_column($input['products'], 'product_id');
+            $has_optical = \App\Product::whereIn('id', $product_ids)
+                ->where(function($q) {
+                    $q->whereNotNull('optical_product_type')->where('optical_product_type', '!=', '');
+                })->exists();
+            if ($has_optical) {
+                $optician_status = 'prescription_received';
+            }
+        }
+
         $update_date = [
+            'prescription_id' => $prescription_id,
+            'optician_status' => $optician_status,
             'status' => $input['status'],
             'invoice_no' => ! empty($input['invoice_no']) ? $input['invoice_no'] : $invoice_no,
             'contact_id' => $input['contact_id'],

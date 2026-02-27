@@ -189,7 +189,37 @@
                     {{ @format_date('now') }}
                 </button>
 
+                {{-- Keyboard shortcuts help button --}}
+                <details class="tw-relative tw-hidden lg:tw-inline-block">
+                    <summary title="Raccourcis clavier"
+                        class="tw-inline-flex tw-transition-all tw-ring-1 tw-ring-white/10 tw-cursor-pointer tw-duration-200 tw-bg-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-800 hover:tw-bg-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-700 tw-p-1.5 tw-rounded-lg tw-items-center tw-justify-center tw-text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="tw-size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M2 6a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2v-12z"/>
+                            <path d="M6 10h.01"/><path d="M10 10h.01"/><path d="M14 10h.01"/><path d="M18 10h.01"/>
+                            <path d="M6 14h.01"/><path d="M18 14h.01"/><path d="M10 14h4"/>
+                        </svg>
+                    </summary>
+                    <div class="tw-absolute tw-right-0 tw-z-50 tw-mt-2 tw-w-72 tw-bg-gray-900 tw-text-white tw-rounded-xl tw-shadow-2xl tw-p-4 tw-text-xs">
+                        <p class="tw-font-bold tw-text-sm tw-mb-2 tw-text-indigo-300">⌨️ Raccourcis clavier</p>
+                        <table class="tw-w-full tw-border-collapse">
+                            <tbody>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+H</kbd></td><td class="tw-text-gray-300">Tableau de bord</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+P</kbd></td><td class="tw-text-gray-300">Point de Vente</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+C</kbd></td><td class="tw-text-gray-300">Liste clients</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+N</kbd></td><td class="tw-text-gray-300">Nouveau client</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+S</kbd></td><td class="tw-text-gray-300">Ventes</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+R</kbd></td><td class="tw-text-gray-300">Rapports</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Alt+O</kbd></td><td class="tw-text-gray-300">Ordonnance (formulaire)</td></tr>
+                                <tr class="tw-border-b tw-border-gray-700"><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Ctrl+↵</kbd></td><td class="tw-text-gray-300">Valider le formulaire</td></tr>
+                                <tr><td class="tw-py-1 tw-pr-3"><kbd class="tw-bg-gray-700 tw-rounded tw-px-1.5 tw-py-0.5">Esc</kbd></td><td class="tw-text-gray-300">Fermer la fenêtre</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+
                 @include('layouts.partials.header-notifications')
+
 
 
 

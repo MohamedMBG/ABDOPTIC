@@ -151,6 +151,17 @@
                         <a href="#activities_tab" data-toggle="tab" aria-expanded="true"><i class="fas fa-pen-square" aria-hidden="true"></i> @lang('lang_v1.activities')</a>
                         </li>
 
+                    @if(in_array($contact->type, ['customer', 'both']))
+                        <li class="
+                            @if(!empty($view_type) &&  $view_type == 'prescriptions')
+                                active
+                            @else
+                                ''
+                            @endif">
+                            <a href="#prescriptions_tab" data-toggle="tab" aria-expanded="true"><i class="fas fa-glasses" aria-hidden="true"></i> Prescriptions (Ordonnance)</a>
+                        </li>
+                    @endif
+
                     @if(!empty($contact_view_tabs))
                         @foreach($contact_view_tabs as $key => $tabs)
                             @foreach ($tabs as $index => $value)
@@ -293,6 +304,20 @@
                         id="activities_tab">
                         @include('activity_log.activities')
                     </div>
+
+                    @if(in_array($contact->type, ['customer', 'both']))
+                        <div class="tab-pane
+                            @if(!empty($view_type) &&  $view_type == 'prescriptions')
+                                active
+                            @else
+                                ''
+                            @endif"
+                            id="prescriptions_tab">
+                            <div id="contact_prescriptions_div">
+                                <div class="text-center"><i class="fas fa-sync fa-spin fa-fw margin-bottom"></i></div>
+                            </div>
+                        </div>
+                    @endif
 
                     @if(!empty($contact_view_tabs))
                         @foreach($contact_view_tabs as $key => $tabs)
@@ -488,6 +513,23 @@ function get_contact_payments(url = null) {
         success: function(result) {
             $('#contact_payments_div').fadeOut(400, function(){
                 $('#contact_payments_div')
+                .html(result).fadeIn(400);
+            });
+        },
+    });
+}
+
+$(document).one('shown.bs.tab', 'a[href="#prescriptions_tab"]', function(){
+    get_contact_prescriptions();
+})
+
+function get_contact_prescriptions() {
+    $.ajax({
+        url: '/contacts/{{$contact->id}}/prescriptions',
+        dataType: 'html',
+        success: function(result) {
+            $('#contact_prescriptions_div').fadeOut(400, function(){
+                $('#contact_prescriptions_div')
                 .html(result).fadeIn(400);
             });
         },

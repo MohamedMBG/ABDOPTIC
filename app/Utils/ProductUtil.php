@@ -386,16 +386,6 @@ class ProductUtil extends Util
         return true;
     }
 
-    /**
-     * Checks if products has manage stock enabled then Decrease quantity for product and its variations
-     *
-     * @param $product_id
-     * @param $variation_id
-     * @param $location_id
-     * @param $new_quantity
-     * @param $old_quantity = 0
-     * @return bool
-     */
     public function decreaseProductQuantity($product_id, $variation_id, $location_id, $new_quantity, $old_quantity = 0)
     {
         $qty_difference = $new_quantity - $old_quantity;
@@ -423,6 +413,37 @@ class ProductUtil extends Util
             }
 
             $details->decrement('qty_available', $qty_difference);
+
+            // Check if alert quantity is reached to send email
+            if (!empty($product->alert_quantity) && $product->alert_quantity > 0) {
+                // Refresh details to get the current qty
+                $details->refresh();
+                if ($details->qty_available <= $product->alert_quantity) {
+                    try {
+                        // Find the business owner or admin to notify
+                        $business = \App\Business::find($product->business_id);
+                        if ($business) {
+                            $admin = \App\User::where('business_id', $business->id)->whereHas('roles', function($q){
+                                $q->where('name', 'like', '%Admin%');
+                            })->first();
+                            
+                            if (!$admin) { 
+                                $admin = \App\User::where('business_id', $business->id)->first(); 
+                            }
+                            
+                            $location_name = '';
+                            $location = \App\BusinessLocation::find($location_id);
+                            if ($location) { $location_name = $location->name; }
+
+                            if ($admin && $admin->email) {
+                                $admin->notify(new \App\Notifications\StockAlertNotification($product->name, $details->qty_available, $product->sku, $location_name));
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to send stock alert notification: " . $e->getMessage());
+                    }
+                }
+            }
         }
 
         return true;

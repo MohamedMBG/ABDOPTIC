@@ -38,6 +38,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationTemplateController;
 use App\Http\Controllers\OpeningStockController;
 use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -62,6 +63,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VariationTemplateController;
 use App\Http\Controllers\WarrantyController;
+use App\Http\Controllers\OpticianWorkflowController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -156,9 +158,19 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::post('/contacts/check-contacts-id', [ContactController::class, 'checkContactId']);
     Route::get('/contacts/customers', [ContactController::class, 'getCustomers']);
     Route::resource('contacts', ContactController::class);
+    
+    // Prescriptions routes
+    Route::get('/contacts/{contact_id}/prescriptions', [PrescriptionController::class, 'index']);
+    Route::post('/prescriptions', [PrescriptionController::class, 'store'])->name('prescriptions.store');
+    Route::delete('/prescriptions/{id}', [PrescriptionController::class, 'destroy'])->name('prescriptions.destroy');
 
     Route::get('taxonomies-ajax-index-page', [TaxonomyController::class, 'getTaxonomyIndexPage']);
     Route::resource('taxonomies', TaxonomyController::class);
+
+    // Optician Workflow Routes
+    Route::get('/optician-workflow', [OpticianWorkflowController::class, 'index'])->name('optician.workflow');
+    Route::get('/optician-workflow/update-status-modal/{id}', [OpticianWorkflowController::class, 'updateStatusModal']);
+    Route::post('/optician-workflow/update-status/{id}', [OpticianWorkflowController::class, 'updateStatus']);
 
     Route::resource('variation-templates', VariationTemplateController::class);
 

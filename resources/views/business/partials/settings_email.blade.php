@@ -1,5 +1,19 @@
 <div class="pos-tab-content">
     <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info alert-dismissible tw-mb-4 tw-rounded-lg tw-shadow-sm">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4 class="tw-font-bold"><i class="icon fas fa-envelope"></i> Configuration Facile (Email)</h4>
+                <p>Pour recevoir <b>les alertes de stock</b> ou envoyer des factures à vos clients via <b class="tw-text-white">Gmail</b>, voici la configuration recommandée :</p>
+                <ul class="tw-mt-2 tw-pl-5">
+                    <li><b>Pilote (Driver) :</b> smtp</li>
+                    <li><b>Hôte (Host) :</b> smtp.gmail.com</li>
+                    <li><b>Port :</b> 587</li>
+                    <li><b>Cryptage (Encryption) :</b> tls</li>
+                    <li><b>Mot de passe :</b> Créez un <b>"Mot de passe d'application"</b> depuis les paramètres de sécurité de votre compte Google, et collez-le ici (n\'utilisez pas le vrai mot de passe de votre compte email).</li>
+                </ul>
+            </div>
+        </div>
         @if(!empty($allow_superadmin_email_settings))
         <div class="col-xs-12">
             <div class="form-group">

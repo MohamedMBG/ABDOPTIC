@@ -771,3 +771,163 @@
       cursor: pointer;
     }
   </style>
+
+  <!-- ============ WORKFLOW SPEED CSS ============ -->
+  <style>
+    /* Instant, visible focus ring for all interactive inputs */
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid #4f46e5 !important;
+      outline-offset: 1px;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+      transition: outline 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    /* Fast button click feedback */
+    .btn, .tw-dw-btn, button[type="submit"] {
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+    }
+    .btn:active, .tw-dw-btn:active, button[type="submit"]:active {
+      transform: scale(0.97);
+    }
+
+    /* DataTable row: instant hover highlight for fast scanning */
+    table.dataTable tbody tr:hover {
+      background-color: #f0f4ff !important;
+      cursor: pointer;
+      transition: background-color 0.08s;
+    }
+
+    /* Modal: faster slide-in */
+    .modal.fade .modal-dialog {
+      transition: transform 0.18s ease-out !important;
+      transform: translateY(-20px) !important;
+    }
+    .modal.fade.in .modal-dialog,
+    .modal.fade.show .modal-dialog {
+      transform: translateY(0) !important;
+    }
+
+    /* Smooth collapse for more_contact_info (when jQuery handles it via display:none) */
+    #more_contact_info {
+      overflow: hidden;
+    }
+
+    /* "Show more" button arrow icon transition */
+    button[data-target="#more_contact_info"] i,
+    button[data-bs-target="#more_contact_info"] i {
+      transition: transform 0.2s ease;
+    }
+
+    /* Highlight mandatory fields inline */
+    input:required:invalid:not(:placeholder-shown),
+    select:required:invalid {
+      border-color: #ef4444 !important;
+    }
+
+    /* Keyboard shortcut pill - shown via JS */
+    #kbd_shortcut_hint b {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    /* Prescription table fields - compact & fast */
+    .custom-section input.form-control-sm {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.3rem 0.5rem;
+    }
+    .custom-section input.form-control-sm:focus {
+      background: #fff !important;
+      outline: 2px solid #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+    }
+
+    /* POS / Action buttons - faster hover feedback */
+    .tw-dw-btn-primary:hover, .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    /* ── Submit Button Spinner ── */
+    .wf-spinner {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: wf-spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    @keyframes wf-spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Dim the button while disabled to reinforce "loading" state */
+    form [type="submit"]:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    /* ── DataTable search highlight when focused via "/" ── */
+    .dataTables_filter input:focus {
+      outline: 2px solid #4f46e5 !important;
+      outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(79,70,229,0.12) !important;
+      background: #fff !important;
+    }
+
+    /* ── Page entrance fade-in on navigation ── */
+    @keyframes wf-page-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .content-wrapper {
+      animation: wf-page-in 0.18s ease-out both;
+    }
+
+    /* ── Quick-Action cards on dashboard ── */
+    .wf-quick-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .wf-quick-card {
+      flex: 1 1 180px;
+      min-width: 160px;
+      max-width: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none !important;
+      color: #fff !important;
+      gap: 8px;
+      transition: transform 0.13s ease, box-shadow 0.13s ease, filter 0.13s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+      cursor: pointer;
+      border: none;
+    }
+    .wf-quick-card:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      filter: brightness(1.07);
+      color: #fff !important;
+    }
+    .wf-quick-card:active {
+      transform: scale(0.97);
+    }
+    .wf-quick-card .wf-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .wf-quick-card.wf-blue  { background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%); }
+    .wf-quick-card.wf-green { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+    .wf-quick-card.wf-orange{ background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%); }
+  </style>

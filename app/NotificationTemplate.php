@@ -177,61 +177,62 @@ class NotificationTemplate extends Model
             [
                 'business_id' => $business_id,
                 'template_for' => 'new_sale',
-                'email_body' => '<p>Dear {contact_name},</p>
+                'email_body' => '<p>Bonjour {contact_name} / سلام {contact_name},</p>
 
-                    <p>Your invoice number is {invoice_number}<br />
-                    Total amount: {total_amount}<br />
-                    Paid amount: {received_amount}</p>
+                    <p>Votre facture / رقم الفاتورة: {invoice_number}<br />
+                    Montant total / المجموع: {total_amount}<br />
+                    Montant payé / تم دفع: {received_amount}</p>
 
-                    <p>Thank you for shopping with us.</p>
+                    <p>Merci pour votre visite ! شكرا على زيارتكم</p>
 
                     <p>{business_logo}</p>
 
                     <p>&nbsp;</p>',
-                'sms_body' => 'Dear {contact_name}, Thank you for shopping with us. {business_name}',
-                'subject' => 'Thank you from {business_name}',
+                'sms_body' => 'Bonjour {contact_name}, Merci pour votre visite. سلام {contact_name}، شكرا على ثقتكم فينا. {business_name}',
+                'subject' => 'Merci de la part de / شكرا من {business_name}',
                 'auto_send' => '0',
             ],
 
             [
                 'business_id' => $business_id,
                 'template_for' => 'payment_received',
-                'email_body' => '<p>Dear {contact_name},</p>
+                'email_body' => '<p>Bonjour {contact_name} / سلام {contact_name},</p>
 
-                <p>We have received a payment of {received_amount}</p>
+                <p>Nous avons bien reçu un paiement de {received_amount}.<br>
+                لقد توصلنا بخلاص قدره {received_amount}.</p>
 
                 <p>{business_logo}</p>',
-                'sms_body' => 'Dear {contact_name}, We have received a payment of {received_amount}. {business_name}',
-                'subject' => 'Payment Received, from {business_name}',
+                'sms_body' => 'Bonjour {contact_name}, Paiement de {received_amount} bien reçu. سلام، توصلنا بخلاص ديال {received_amount}. {business_name}',
+                'subject' => 'Paiement Reçu / توصلنا بالخلاص - {business_name}',
                 'auto_send' => '0',
             ],
             [
                 'business_id' => $business_id,
                 'template_for' => 'payment_reminder',
-                'email_body' => '<p>Dear {contact_name},</p>
+                'email_body' => '<p>Bonjour {contact_name} / سلام {contact_name},</p>
 
-                    <p>This is to remind you that you have pending payment of {due_amount}. Kindly pay it as soon as possible.</p>
+                    <p>Ceci est un petit rappel qu\'il vous reste un montant de {due_amount} à régler. Merci de passer nous voir dès que possible.<br>
+                    هذا تذكير بلي باقي مسالينك دافع قدره {due_amount}. المرجو تسوية الوضعية في أقرب وقت.</p>
 
                     <p>{business_logo}</p>',
-                'sms_body' => 'Dear {contact_name}, You have pending payment of {due_amount}. Kindly pay it as soon as possible. {business_name}',
-                'subject' => 'Payment Reminder, from {business_name}',
+                'sms_body' => 'Bonjour {contact_name}, Il vous reste {due_amount} à régler. سلام {contact_name}، باقي مسالينك {due_amount}، المرجو تسوية الوضعية. {business_name}',
+                'subject' => 'Rappel de Paiement / تذكير بالخلاص - {business_name}',
                 'auto_send' => '0',
             ],
             [
                 'business_id' => $business_id,
                 'template_for' => 'new_booking',
-                'email_body' => '<p>Dear {contact_name},</p>
+                'email_body' => '<p>Bonjour {contact_name} / سلام {contact_name},</p>
 
-                    <p>Your booking is confirmed</p>
+                    <p>Votre réservation est confirmée / تم تأكيد الحجز</p>
 
-                    <p>Date: {start_time} to {end_time}</p>
+                    <p>Date / التاريخ: {start_time} to {end_time}</p>
 
-                    <p>Table: {table}</p>
-
-                    <p>Location: {location}</p>
+                    <p>Lieu / المكان: {location}</p>
 
                     <p>{business_logo}</p>',
-                'sms_body' => 'Dear {contact_name}, Your booking is confirmed. Date: {start_time} to {end_time}, Table: {table}, Location: {location}', 'subject' => 'Booking Confirmed - {business_name}',
+                'sms_body' => 'Bonjour {contact_name}, réservation confirmée le {start_time}. سلام {contact_name}، تم تأكيد الحجز نهار {start_time}. {business_name}', 
+                'subject' => 'Réservation Confirmée / تأكيد الحجز - {business_name}',
                 'auto_send' => '0',
             ],
             [

@@ -179,6 +179,86 @@
             </div>
     @endcomponent
 
+    <!-- OPTICAL SPECIFICS SECTION -->
+    @component('components.widget', ['class' => 'box-info'])
+    <div class="row">
+        <div class="col-md-12">
+            <h4 style="border-bottom: 2px solid #cae8f5; padding-bottom: 5px; margin-bottom: 20px;">
+                <i class="fas fa-glasses text-info"></i> Optical Specifics (Optician)
+            </h4>
+        </div>
+        
+        <div class="col-sm-4">
+            <div class="form-group">
+                {!! Form::label('optical_product_type', 'Optical Product Type:') !!}
+                {!! Form::select('optical_product_type', ['' => 'Standard Product (Not Optical)', 'frame' => 'Frame (Monture)', 'lens' => 'Lens (Verre)', 'contact_lens' => 'Contact Lens'], $product->optical_product_type, ['class' => 'form-control select2', 'id' => 'optical_product_type']); !!}
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <!-- Frame Details -->
+        <div id="frame_details_section" style="display: none; background-color: #fcfdfd; padding: 15px; border-radius: 5px; border: 1px solid #eee; margin: 15px;">
+            <div class="col-md-12"><h5 class="text-primary mt-0">Frame Details</h5></div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('frame_color', 'Color:') !!}
+                    {!! Form::text('frame_color', $product->frame_color, ['class' => 'form-control', 'placeholder' => 'e.g. Tortoise, Black']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('frame_eye_size', 'Eye Size (A):') !!}
+                    {!! Form::text('frame_eye_size', $product->frame_eye_size, ['class' => 'form-control', 'placeholder' => 'e.g. 52']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('frame_bridge_size', 'Bridge Size (DBL):') !!}
+                    {!! Form::text('frame_bridge_size', $product->frame_bridge_size, ['class' => 'form-control', 'placeholder' => 'e.g. 18']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('frame_temple_length', 'Temple Length:') !!}
+                    {!! Form::text('frame_temple_length', $product->frame_temple_length, ['class' => 'form-control', 'placeholder' => 'e.g. 140']); !!}
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <!-- Lens Details -->
+        <div id="lens_details_section" style="display: none; background-color: #fdfdfc; padding: 15px; border-radius: 5px; border: 1px solid #eee; margin: 15px;">
+            <div class="col-md-12"><h5 class="text-success mt-0">Lens Details</h5></div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('lens_type', 'Lens Type:') !!}
+                    {!! Form::select('lens_type', ['' => 'Select', 'single_vision' => 'Single Vision', 'bifocal' => 'Bifocal', 'progressive' => 'Progressive', 'occupational' => 'Occupational'], $product->lens_type, ['class' => 'form-control select2']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('lens_material', 'Material:') !!}
+                    {!! Form::select('lens_material', ['' => 'Select', 'cr39' => 'CR-39 (Standard)', 'polycarbonate' => 'Polycarbonate', 'trivex' => 'Trivex', 'high_index' => 'High Index (1.67, 1.74)', 'mineral' => 'Mineral Glass'], $product->lens_material, ['class' => 'form-control select2']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('lens_index', 'Index:') !!}
+                    {!! Form::text('lens_index', $product->lens_index, ['class' => 'form-control', 'placeholder' => 'e.g. 1.50, 1.67']); !!}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {!! Form::label('lens_coating', 'Coating:') !!}
+                    {!! Form::select('lens_coating', ['' => 'Select', 'hard_coat' => 'Hard Coat (HC)', 'ar' => 'Anti-Reflective (AR)', 'blue_control' => 'Blue Light Control', 'photochromic' => 'Photochromic (Transitions)', 'polarized' => 'Polarized'], $product->lens_coating, ['class' => 'form-control select2']); !!}
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    @endcomponent
+
     @component('components.widget', ['class' => 'box-primary'])
         <div class="row">
         @if(session('business.enable_product_expiry'))
@@ -385,6 +465,24 @@
   <script type="text/javascript">
     $(document).ready( function(){
       __page_leave_confirmation('#product_add_form');
+
+      // Optical product type toggle logic
+      function toggleOpticalSections() {
+          var selectedType = $('#optical_product_type').val();
+          if (selectedType === 'frame') {
+              $('#frame_details_section').slideDown();
+              $('#lens_details_section').slideUp();
+          } else if (selectedType === 'lens' || selectedType === 'contact_lens') {
+              $('#lens_details_section').slideDown();
+              $('#frame_details_section').slideUp();
+          } else {
+              $('#frame_details_section').slideUp();
+              $('#lens_details_section').slideUp();
+          }
+      }
+      
+      $('#optical_product_type').on('change', toggleOpticalSections);
+      toggleOpticalSections(); // Initial check
     });
   </script>
 @endsection

@@ -104,6 +104,29 @@
 	      			</div>
 	      			<div class="clearfix"></div>
 	      			<br>
+					@if($product->optical_product_type == 'frame')
+					<div class="col-sm-12">
+						<div class="well well-sm">
+							<h5 class="text-primary mt-0"><i class="fas fa-glasses"></i> Frame Details</h5>
+							<b>Color:</b> {{$product->frame_color ?? '--'}} &nbsp;&nbsp;
+							<b>Eye Size (A):</b> {{$product->frame_eye_size ?? '--'}} &nbsp;&nbsp;
+							<b>Bridge Size (DBL):</b> {{$product->frame_bridge_size ?? '--'}} &nbsp;&nbsp;
+							<b>Temple Length:</b> {{$product->frame_temple_length ?? '--'}}
+						</div>
+					</div>
+					@elseif(in_array($product->optical_product_type, ['lens', 'contact_lens']))
+					<div class="col-sm-12">
+						<div class="well well-sm">
+							<h5 class="text-success mt-0"><i class="fas fa-eye"></i> Lens Details</h5>
+							<b>Lens Type:</b> {{ ucfirst(str_replace('_', ' ', $product->lens_type )) ?? '--'}} &nbsp;&nbsp;
+							<b>Material:</b> {{ ucfirst(str_replace('_', ' ', $product->lens_material )) ?? '--'}} &nbsp;&nbsp;
+							<b>Index:</b> {{$product->lens_index ?? '--'}} &nbsp;&nbsp;
+							<b>Coating:</b> {{ ucfirst(str_replace('_', ' ', $product->lens_coating )) ?? '--'}}
+						</div>
+					</div>
+					@endif
+					<div class="clearfix"></div>
+	      			<br>
       				<div class="col-sm-12">
       					{!! $product->product_description !!}
       				</div>

@@ -83,10 +83,14 @@ class HomeController extends Controller
         //ensure start date starts from at least 30 days before to get sells last 30 days
         $least_30_days = \Carbon::parse($fy['start'])->subDays(30)->format('Y-m-d');
 
-        //get all sells
-        $sells_this_fy = $this->transactionUtil->getSellsCurrentFy($business_id, $least_30_days, $fy['end']);
+        //get all sells (Cached for 30 minutes to make the dashboard fast)
+        $sells_this_fy = \Cache::remember('sells_this_fy_' . $business_id . '_' . $least_30_days, 60 * 30, function () use ($business_id, $least_30_days, $fy) {
+            return $this->transactionUtil->getSellsCurrentFy($business_id, $least_30_days, $fy['end']);
+        });
 
-        $all_locations = BusinessLocation::forDropdown($business_id)->toArray();
+        $all_locations = \Cache::remember('all_locations_' . $business_id, 60 * 60 * 24, function () use ($business_id) {
+            return BusinessLocation::forDropdown($business_id)->toArray();
+        });
 
         //Chart for sells last 30 days
         $labels = [];
@@ -196,8 +200,10 @@ class HomeController extends Controller
             $sells_chart_2->dataset(__('report.all_locations'), 'line', $values);
         }
 
-        //Get Dashboard widgets from module
-        $module_widgets = $this->moduleUtil->getModuleData('dashboard_widget');
+        //Get Dashboard widgets from module (Cached)
+        $module_widgets = \Cache::remember('module_dashboard_widgets_' . $business_id, 60 * 60, function () {
+            return $this->moduleUtil->getModuleData('dashboard_widget');
+        });
 
         $widgets = [];
 
@@ -229,11 +235,17 @@ class HomeController extends Controller
             // get user id parameter
             $created_by = request()->user_id;
 
-            $purchase_details = $this->transactionUtil->getPurchaseTotals($business_id, $start, $end, $location_id, $created_by);
+            $purchase_details = \Cache::remember("dash_purchases_{$business_id}_{$start}_{$end}_{$location_id}_{$created_by}", 60, function () use ($business_id, $start, $end, $location_id, $created_by) {
+                return $this->transactionUtil->getPurchaseTotals($business_id, $start, $end, $location_id, $created_by);
+            });
 
-            $sell_details = $this->transactionUtil->getSellTotals($business_id, $start, $end, $location_id, $created_by);
+            $sell_details = \Cache::remember("dash_sells_{$business_id}_{$start}_{$end}_{$location_id}_{$created_by}", 60, function () use ($business_id, $start, $end, $location_id, $created_by) {
+                return $this->transactionUtil->getSellTotals($business_id, $start, $end, $location_id, $created_by);
+            });
 
-            $total_ledger_discount = $this->transactionUtil->getTotalLedgerDiscount($business_id, $start, $end);
+            $total_ledger_discount = \Cache::remember("dash_ledger_disc_{$business_id}_{$start}_{$end}", 60, function () use ($business_id, $start, $end) {
+                return $this->transactionUtil->getTotalLedgerDiscount($business_id, $start, $end);
+            });
 
             $purchase_details['purchase_due'] = $purchase_details['purchase_due'] - $total_ledger_discount['total_purchase_discount'];
 
@@ -241,14 +253,16 @@ class HomeController extends Controller
                 'purchase_return', 'sell_return', 'expense',
             ];
 
-            $transaction_totals = $this->transactionUtil->getTransactionTotals(
-                $business_id,
-                $transaction_types,
-                $start,
-                $end,
-                $location_id,
-                $created_by
-            );
+            $transaction_totals = \Cache::remember("dash_trans_{$business_id}_{$start}_{$end}_{$location_id}_{$created_by}", 60, function () use ($business_id, $transaction_types, $start, $end, $location_id, $created_by) {
+                return $this->transactionUtil->getTransactionTotals(
+                    $business_id,
+                    $transaction_types,
+                    $start,
+                    $end,
+                    $location_id,
+                    $created_by
+                );
+            });
 
             $total_purchase_inc_tax = ! empty($purchase_details['total_purchase_inc_tax']) ? $purchase_details['total_purchase_inc_tax'] : 0;
             $total_purchase_return_inc_tax = $transaction_totals['total_purchase_return_inc_tax'];

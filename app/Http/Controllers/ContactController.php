@@ -613,6 +613,12 @@ class ContactController extends Controller
             'custom_field10', 'email', 'shipping_address', 'position', 'dob', 'shipping_custom_field_details',
             'assigned_to_users', 'amount_received', 'amount_owed'
         ]);
+        
+        // Extract optical (ordonnance) fields
+        $prescription_data = $request->only([
+            'od_sphere', 'od_cylinder', 'od_axis', 'od_addition', 'od_pd',
+            'os_sphere', 'os_cylinder', 'os_axis', 'os_addition', 'os_pd'
+        ]);
 
 
         // Handle Image Upload
@@ -689,6 +695,16 @@ class ContactController extends Controller
 
         // Activity log
         $this->contactUtil->activityLog($output['data'], 'added');
+
+        // Check if we need to create an ordonnance (prescription) alongside the contact
+        $has_prescription = array_filter($prescription_data, function($val) { return !empty($val); });
+        
+        if (in_array($input['type'], ['customer', 'both']) && !empty($has_prescription)) {
+            $prescription_data['contact_id'] = $output['data']->id;
+            $prescription_data['created_by'] = $request->session()->get('user.id');
+            $prescription_data['notes'] = 'Initial prescription added during customer creation.';
+            \App\Prescription::create($prescription_data);
+        }
 
         DB::commit();
 

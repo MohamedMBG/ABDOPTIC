@@ -210,11 +210,212 @@
 
         $('.dt-buttons.btn-group').find('a.btn').removeClass('btn-default');
         $('.dt-buttons.btn-group').find('a.btn').removeClass('btn');
-        
-        // $('.date_range').on('show.daterangepicker', function (ev, picker) {
-        //     $(picker.container).insertAfter($(this));
-        // });
    
+    });
+
+    /* ============================================================
+       WORKFLOW SPEED MODULE — Keyboard shortcuts, auto-focus, etc.
+    ============================================================ */
+    $(document).ready(function() {
+
+        // ── 1. KEYBOARD SHORTCUTS ─────────────────────────────────
+        // Show a floating shortcut hint bar (fade-in then fade-out once per session)
+        if (!sessionStorage.getItem('kbd_hint_shown')) {
+            var $hint = $('<div id="kbd_shortcut_hint"></div>').css({
+                position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                background: 'rgba(30,30,40,0.92)', color: '#fff', borderRadius: '10px',
+                padding: '10px 22px', fontSize: '13px', zIndex: 99999,
+                boxShadow: '0 4px 24px rgba(0,0,0,0.25)', letterSpacing: '0.3px',
+                opacity: 0, transition: 'opacity 0.4s'
+            }).html(
+                '⌨️ Raccourcis : <b>Alt+H</b> Accueil &nbsp;|&nbsp; <b>Alt+P</b> POS &nbsp;|&nbsp; <b>Alt+C</b> Clients &nbsp;|&nbsp; <b>Alt+N</b> Nouveau client &nbsp;|&nbsp; <b>Alt+D</b> Ventes &nbsp;|&nbsp; <b>/</b> Rechercher &nbsp;|&nbsp; <b>Ctrl+↵</b> Valider &nbsp;|&nbsp; <b>Esc</b> Fermer'
+            ).appendTo('body');
+            setTimeout(function(){ $hint.css('opacity', 1); }, 300);
+            setTimeout(function(){ $hint.css('opacity', 0); setTimeout(function(){ $hint.remove(); }, 500); }, 6000);
+            sessionStorage.setItem('kbd_hint_shown', '1');
+        }
+
+        $(document).on('keydown', function(e) {
+            var tag = (e.target.tagName || '').toLowerCase();
+            var isInput = (tag === 'input' || tag === 'textarea' || tag === 'select');
+
+            // Alt + key shortcuts (work from anywhere)
+            if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'h': // Home / Dashboard
+                        e.preventDefault();
+                        window.location.href = base_path + '/home';
+                        break;
+                    case 'p': // POS Sale
+                        e.preventDefault();
+                        window.location.href = base_path + '/pos/create';
+                        break;
+                    case 'c': // Customers list
+                        e.preventDefault();
+                        window.location.href = base_path + '/contacts?type=customer';
+                        break;
+                    case 'n': // New Customer modal — click the first .btn-modal with contacts route
+                        e.preventDefault();
+                        var $addBtn = $('a.btn-modal[data-href*="contacts/create"], a.btn-modal[data-href*="contact/create"]').first();
+                        if ($addBtn.length) {
+                            $addBtn.trigger('click');
+                        } else {
+                            window.location.href = base_path + '/contacts?type=customer';
+                        }
+                        break;
+                    case 's': // Sells list
+                    case 'd': // Sells list alias (D=Dossiers)
+                        e.preventDefault();
+                        window.location.href = base_path + '/sells';
+                        break;
+                    case 'r': // Reports
+                        e.preventDefault();
+                        window.location.href = base_path + '/reports/profit-loss';
+                        break;
+                    case 'f': // Focus date/filter field on listing pages
+                        e.preventDefault();
+                        var $dateFilter = $('[id*="filter_date_range"]:visible').first();
+                        if ($dateFilter.length) {
+                            $dateFilter.trigger('focus').trigger('click');
+                        } else {
+                            $('.dataTables_filter input:visible').first().trigger('focus');
+                        }
+                        break;
+                }
+            }
+
+            // Ctrl+Enter → submit the current form
+            if (e.ctrlKey && (e.key === 'Enter' || e.keyCode === 13)) {
+                var $form = null;
+                // try focused element's form first
+                if (isInput && e.target.form) {
+                    $form = $(e.target.form);
+                } else {
+                    // find the active/visible modal form
+                    $form = $('.modal.in form:visible, .modal.show form:visible').first();
+                    if (!$form.length) {
+                        $form = $('form:visible').first();
+                    }
+                }
+                if ($form && $form.length) {
+                    e.preventDefault();
+                    // trigger submit button if present for validation hooks
+                    var $submitBtn = $form.find('[type="submit"]:not([disabled])').first();
+                    if ($submitBtn.length) { $submitBtn.trigger('click'); }
+                    else { $form.submit(); }
+                }
+            }
+
+            // Escape → close topmost open Bootstrap modal
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                var $modal = $('.modal.in, .modal.show').last();
+                if ($modal.length && !isInput) {
+                    $modal.modal('hide');
+                }
+            }
+
+            // "/" → focus the DataTable search box (when not in an input)
+            if ((e.key === '/' || e.keyCode === 191) && !isInput && !e.ctrlKey && !e.altKey) {
+                var $dtSearch = $('.dataTables_filter input:visible').first();
+                if ($dtSearch.length) {
+                    e.preventDefault();
+                    $dtSearch.trigger('focus').trigger('select');
+                }
+            }
+        });
+
+        // ── 2. AUTO-FOCUS FIRST INPUT ON MODAL OPEN ─────────────
+        $(document).on('shown.bs.modal', function(e) {
+            var $modal = $(e.target);
+            // Focus first visible enabled input (skip hidden, file, checkbox, radio)
+            var $first = $modal.find('input:visible:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([disabled]):not([readonly]), select:visible:not([disabled]):not([readonly]), textarea:visible:not([disabled]):not([readonly])').first();
+            if ($first.length) {
+                setTimeout(function() { $first.trigger('focus'); }, 150);
+            }
+        });
+
+        // ── 3. AUTO-SELECT ON FOCUS (number & text inputs) ───────
+        // Makes it fast to overtype an existing value without deleting
+        $(document).on('focus', 'input[type="number"], input[type="text"].form-control, input[type="tel"].form-control', function() {
+            var self = this;
+            setTimeout(function() { $(self).select(); }, 50);
+        });
+
+        // ── 4. ENTER KEY ADVANCES TO NEXT FIELD (in prescription sections) ──
+        $(document).on('keydown', '.custom-section input, .prescription-table input', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                var $inputs = $('.custom-section input:visible, .prescription-table input:visible');
+                var idx = $inputs.index(this);
+                if (idx >= 0 && idx < $inputs.length - 1) {
+                    $inputs.eq(idx + 1).trigger('focus');
+                }
+            }
+        });
+
+        // ── 5. DATATABLE SEARCH: Esc clears, Enter fires immediately ──
+        $(document).on('keydown', '.dataTables_filter input', function(e) {
+            if (e.key === 'Escape') {
+                $(this).val('').trigger('input');
+                e.stopPropagation();
+            }
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                var $input = $(this);
+                var $table = $input.closest('.dataTables_wrapper').find('table');
+                if ($table.length && $.fn.DataTable.isDataTable($table)) {
+                    $table.DataTable().search($input.val()).draw();
+                }
+                e.stopPropagation();
+            }
+        });
+
+        // ── 6. DOUBLE-CLICK ANY TABLE ROW → OPEN DETAILS ─────────
+        $(document).on('dblclick', 'table.ajax_view tbody tr, #contact_table tbody tr, #sell_table tbody tr', function() {
+            var $actionBtn = $(this).find(
+                'a[title*="View"], a[title*="Voir"], a[data-href*="/show"], ' +
+                'a[href*="/show"], a[title*="Edit"], a[title*="Modifier"]'
+            ).first();
+            if (!$actionBtn.length) {
+                $actionBtn = $(this).find('td:first-child a').first();
+            }
+            if ($actionBtn.length) {
+                if ($actionBtn.hasClass('btn-modal') || $actionBtn.data('href')) {
+                    $actionBtn.trigger('click');
+                } else if ($actionBtn.attr('href') && $actionBtn.attr('href') !== '#') {
+                    window.location.href = $actionBtn.attr('href');
+                } else {
+                    $actionBtn.trigger('click');
+                }
+            }
+        });
+
+        // ── 7. SUBMIT BUTTON SPINNER (prevent double-submit) ─────
+        $(document).on('click', 'form [type="submit"]:not([data-no-spinner])', function() {
+            var $btn = $(this);
+            var $form = $btn.closest('form');
+            var isValid = true;
+            if ($form.length && $form.data('validator')) {
+                isValid = $form.valid();
+            }
+            if (isValid) {
+                var origHtml = $btn.html();
+                $btn.data('orig-html', origHtml);
+                setTimeout(function() {
+                    if ($btn.is(':visible')) {
+                        $btn.prop('disabled', true).html('<span class="wf-spinner"></span> ' + origHtml);
+                        setTimeout(function() {
+                            $btn.prop('disabled', false).html(origHtml);
+                        }, 8000);
+                    }
+                }, 80);
+            }
+        });
+        $(document).on('invalid-form.validate', 'form', function() {
+            var $btn = $(this).find('[type="submit"]');
+            var origHtml = $btn.data('orig-html');
+            if (origHtml) { $btn.prop('disabled', false).html(origHtml); }
+        });
+
     });
 </script>
 

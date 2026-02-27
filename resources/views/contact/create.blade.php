@@ -1,11 +1,11 @@
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content bg-white rounded-lg shadow-sm p-0"> 
         <!-- Modal Header -->
-        <div class="modal-header border-bottom-0 bg-white">
+        <div class="modal-header border-bottom-0 bg-white tw-bg-gray-50 tw-rounded-t-2xl tw-pb-2">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <h2 class="modal-title text-center w-100">Create New Contact</h2>
+            <h2 class="modal-title text-center w-100 tw-font-bold tw-text-gray-800">Ajouter un Contact</h2>
         </div>
 
         @php
@@ -27,222 +27,158 @@
             @csrf
 
             <!-- Basic Information Card -->
-            <div class="modal-body">
-            <div class="card mb-4 border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom-0">
-                    <h4 class="mb-0">Basic Information</h4>
+            <div class="modal-body pb-0">
+            <div class="card mb-0 border-0 shadow-sm tw-rounded-xl tw-overflow-hidden">
+                <div class="card-header border-bottom-0 tw-bg-gradient-to-r tw-from-blue-50 tw-to-white tw-px-6 tw-py-4">
+                    <h4 class="mb-0 tw-text-blue-800 tw-font-bold"><i class="fas fa-user-plus tw-text-blue-500 tw-mr-2"></i> Informations Principales</h4>
                 </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        {!! Form::label('type', 'Type:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::select('type', ['customer' => 'Customer', 'supplier' => 'Supplier', 'both' => 'Both'], null, ['class' => 'form-control border-left-0', 'required']) !!}
+                <div class="card-body tw-p-6">
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            {!! Form::label('type', 'Type de contact: *', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            <div class="input-group">
+                                <span class="input-group-addon tw-bg-gray-50 tw-border-gray-200 tw-border-r-0">
+                                    <i class="fas fa-users tw-text-gray-400"></i>
+                                </span>
+                        {!! Form::select('type', ['customer' => 'Client', 'supplier' => 'Fournisseur', 'both' => 'Les deux'], null, ['class' => 'form-control tw-border-gray-200 tw-border-l-0', 'required', 'id' => 'type', 'tabindex' => '1']) !!}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        {!! Form::label('contact_type_radio', 'Contact Type:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-users text-muted"></i>
-                            </span>
-                            <div class="form-control border-left-0">
-                                <label class="radio-inline mr-3">
-                                    {!! Form::radio('contact_type_radio', 'individual', true) !!} Individual
+                        <div class="col-md-4 mb-4">
+                            {!! Form::label('mobile', 'Téléphone (Mobile): *', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            <div class="input-group">
+                                <span class="input-group-addon tw-bg-gray-50 tw-border-gray-200 tw-border-r-0">
+                                    <i class="fas fa-mobile-alt tw-text-gray-400"></i>
+                                </span>
+                                {!! Form::text('mobile', null, ['class' => 'form-control tw-border-gray-200 tw-border-l-0', 'required', 'placeholder' => 'Ex: 06 00 00 00 00', 'tabindex' => '2']) !!}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            {!! Form::label('contact_type_radio', 'Personnalité:', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            <div class="tw-flex tw-items-center tw-h-10 tw-gap-4">
+                                <label class="radio-inline mb-0 tw-text-gray-600">
+                                    {!! Form::radio('contact_type_radio', 'individual', true) !!} Particulier
                                 </label>
-                                <label class="radio-inline">
-                                    {!! Form::radio('contact_type_radio', 'business') !!} Business
+                                <label class="radio-inline mb-0 tw-text-gray-600">
+                                    {!! Form::radio('contact_type_radio', 'business') !!} Société
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        {!! Form::label('prefix', 'Prefix:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::text('prefix', null, ['class' => 'form-control border-left-0', 'placeholder' => 'Mr/Mrs/Dr']) !!}
+                    <div class="row">
+                        <div class="col-md-2 mb-4">
+                            {!! Form::label('prefix', 'Civilité:', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            {!! Form::text('prefix', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Mr/Mme']) !!}
+                        </div>
+
+                        <div class="col-md-5 mb-4">
+                            {!! Form::label('first_name', 'Prénom: *', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            {!! Form::text('first_name', null, ['class' => 'form-control tw-border-gray-200', 'required', 'placeholder' => 'Prénom', 'tabindex' => '3']) !!}
+                        </div>
+
+                        <div class="col-md-5 mb-4">
+                            {!! Form::label('last_name', 'Nom:', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            {!! Form::text('last_name', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Nom de famille', 'tabindex' => '4']) !!}
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        {!! Form::label('first_name', 'First Name: *') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::text('first_name', null, ['class' => 'form-control border-left-0', 'required', 'placeholder' => 'First Name']) !!}
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {!! Form::label('email', 'Email:', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            <div class="input-group">
+                                <span class="input-group-addon tw-bg-gray-50 tw-border-gray-200 tw-border-r-0">
+                                    <i class="fas fa-envelope tw-text-gray-400"></i>
+                                </span>
+                                {!! Form::email('email', null, ['class' => 'form-control tw-border-gray-200 tw-border-l-0', 'placeholder' => 'Email (optionnel)', 'tabindex' => '5']) !!}
+                            </div>
+                        </div>
+
+                        @if(config('constants.enable_contact_assign') && isset($users) && count($users) > 0)
+                        <div class="col-md-6 mb-4">
+                            {!! Form::label('assigned_to_users', 'Assigné à: *', ['class' => 'tw-text-gray-700 tw-font-medium']) !!}
+                            <div class="input-group">
+                                <span class="input-group-addon tw-bg-gray-50 tw-border-gray-200 tw-border-r-0">
+                                    <i class="fas fa-users tw-text-gray-400"></i>
+                                </span>
+                                {!! Form::select('assigned_to_users[]', $users, null, ['class' => 'form-control select2 tw-border-gray-200 tw-border-l-0', 'multiple', 'required', 'id' => 'assigned_to_users']) !!}
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <hr class="tw-my-2 tw-border-gray-100">
+                            <div class="tw-flex tw-justify-center tw-mt-4">
+                                <button type="button" class="btn btn-link tw-text-blue-600 tw-font-medium tw-p-2 hover:tw-bg-blue-50 tw-rounded tw-transition-colors" data-toggle="collapse" data-target="#more_contact_info">
+                                    <i class="fas fa-plus-circle tw-mr-1"></i> Afficher plus de détails (Adresse, Plafond, etc.)
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        {!! Form::label('middle_name', 'Middle Name:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::text('middle_name', null, ['class' => 'form-control border-left-0', 'placeholder' => 'Middle Name']) !!}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        {!! Form::label('last_name', 'Last Name:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::text('last_name', null, ['class' => 'form-control border-left-0', 'placeholder' => 'Last Name']) !!}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        {!! Form::label('email', 'Email:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-envelope text-muted"></i>
-                            </span>
-                            {!! Form::email('email', null, ['class' => 'form-control border-left-0', 'placeholder' => 'Email']) !!}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        {!! Form::label('mobile', 'Mobile: *') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-mobile text-muted"></i>
-                            </span>
-                            {!! Form::text('mobile', null, ['class' => 'form-control border-left-0', 'required', 'placeholder' => 'Mobile Number']) !!}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        {!! Form::label('image', 'Profile Image:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-image text-muted"></i>
-                            </span>
-                            {!! Form::file('image', ['class' => 'form-control border-left-0', 'accept' => 'image/*']) !!}
-                        </div>
-                        <small class="form-text text-muted">Max file size: 2MB (JPEG, PNG, JPG, GIF)</small>
-                    </div>
                 </div>
             </div>
 
-            <!-- Assigned Users Card -->
-            @if(config('constants.enable_contact_assign') && isset($users) && count($users) > 0)
-            <div class="card mb-4 border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom-0">
-                    <h4 class="mb-0">Assigned Users</h4>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        {!! Form::label('user_id', 'Assigned To:*') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::select('user_id[]', $users, null, ['class' => 'form-control select2 border-left-0', 'multiple', 'required']) !!}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        {!! Form::label('assigned_to_users', 'Additional Assigned Users:') !!}
-                        <div class="input-group">
-                            <span class="input-group-addon bg-light border-right-0">
-                                <i class="fa fa-user text-muted"></i>
-                            </span>
-                            {!! Form::select('assigned_to_users[]', $users, null, ['class' => 'form-control select2 border-left-0', 'multiple']) !!}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
+            <div id="more_contact_info" class="collapse">
 
             <!-- Contact Details Card -->
-            <div class="card mb-4 border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom-0">
-                    <h4 class="mb-0">Contact Details</h4>
+            <div class="card my-4 border-0 shadow-sm tw-rounded-xl tw-overflow-hidden">
+                <div class="card-header border-bottom-0 tw-bg-gradient-to-r tw-from-green-50 tw-to-white tw-px-6 tw-py-4">
+                    <h4 class="mb-0 tw-text-green-800 tw-font-bold"><i class="fas fa-map-marked-alt tw-text-green-500 tw-mr-2"></i> Détails Supplémentaires & Adresse</h4>
                 </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="tax_number"><i class="fa fa-id-card text-muted"></i> Tax Number:</label>
-                        {!! Form::text('tax_number', null, ['class' => 'form-control', 'placeholder' => 'Tax number']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="opening_balance">
-                            <i class="fa fa-money text-muted"></i> @lang('account.opening_balance'):
-                        </label>
-                        {!! Form::number('opening_balance', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="amount_received">
-                            <i class="fa fa-money text-muted"></i> @lang('lang_v1.amount_received'):
-                        </label>
-                        {!! Form::number('amount_received', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="amount_owed">
-                            <i class="fa fa-money text-muted"></i> @lang('lang_v1.amount_owed'):
-                        </label>
-                        {!! Form::number('amount_owed', 0, ['class' => 'form-control', 'step' => '0.01']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="pay_term"><i class="fa fa-calendar text-muted"></i> Pay Term:</label>
-                        <div class="row pay-term-row align-items-end">
-                            <div class="col-md-6 pe-2">
-                                {!! Form::number('pay_term_number', null, [
-                                    'class' => 'form-control pay-term-number', 
-                                    'placeholder' => 'Number'
-                                ]) !!}
-                            </div>
-                            <div class="col-md-6 ps-2">
-                                {!! Form::select('pay_term_type', [
-                                    '' => __('messages.please_select'), 
-                                    'days' => __('lang_v1.days'), 
-                                    'months' => __('lang_v1.months')
-                                ], null, [
-                                    'class' => 'form-control select2 pay-term-type-select',
-                                    'style' => 'width: 100%'
-                                ]) !!}
-                            </div>
+                <div class="card-body tw-p-6">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="tax_number" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-id-card tw-text-gray-400 tw-mr-1"></i> N° d'identification (ICE/TVA):</label>
+                            {!! Form::text('tax_number', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'N° Taxe / ICE']) !!}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="opening_balance" class="tw-text-gray-700 tw-font-medium mb-1 d-block">
+                                <i class="fas fa-money-bill-wave tw-text-gray-400 tw-mr-1"></i> Solde d'ouverture:
+                            </label>
+                            {!! Form::number('opening_balance', 0, ['class' => 'form-control tw-border-gray-200', 'step' => '0.01']) !!}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="credit_limit" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-credit-card tw-text-gray-400 tw-mr-1"></i> Plafond de crédit (Limite):</label>
+                            {!! Form::text('credit_limit', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Laissez vide pour aucun']) !!}
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="credit_limit"><i class="fa fa-credit-card text-muted"></i> Credit Limit:</label>
-                        {!! Form::text('credit_limit', null, ['class' => 'form-control', 'placeholder' => 'Keep blank for no limit']) !!}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="address_line1" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-map-marker-alt tw-text-gray-400 tw-mr-1"></i> Adresse Ligne 1:</label>
+                            {!! Form::text('address_line1', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Adresse']) !!}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="address_line2" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-map-marker-alt tw-text-gray-400 tw-mr-1"></i> Adresse Ligne 2:</label>
+                            {!! Form::text('address_line2', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Bâtiment, Étage...']) !!}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="address_line1"><i class="fa fa-map-marker text-muted"></i> Address Line 1:</label>
-                        {!! Form::text('address_line1', null, ['class' => 'form-control', 'placeholder' => 'Address line 1']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="address_line2"><i class="fa fa-map-marker text-muted"></i> Address Line 2:</label>
-                        {!! Form::text('address_line2', null, ['class' => 'form-control', 'placeholder' => 'Address line 2']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="city"><i class="fa fa-map-marker text-muted"></i> City:</label>
-                        {!! Form::text('city', null, ['class' => 'form-control', 'placeholder' => 'City']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="state"><i class="fa fa-map-marker text-muted"></i> State:</label>
-                        {!! Form::text('state', null, ['class' => 'form-control', 'placeholder' => 'State']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="country"><i class="fa fa-map-marker text-muted"></i> Country:</label>
-                        {!! Form::text('country', null, ['class' => 'form-control', 'placeholder' => 'Country']) !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="zip_code"><i class="fa fa-map-marker text-muted"></i> ZIP Code:</label>
-                        {!! Form::text('zip_code', null, ['class' => 'form-control', 'placeholder' => 'ZIP/Postal Code']) !!}
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="city" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-city tw-text-gray-400 tw-mr-1"></i> Ville:</label>
+                            {!! Form::text('city', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Ville']) !!}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="state" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-map tw-text-gray-400 tw-mr-1"></i> Province / Région:</label>
+                            {!! Form::text('state', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Région']) !!}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="zip_code" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-mail-bulk tw-text-gray-400 tw-mr-1"></i> Code Postal:</label>
+                            {!! Form::text('zip_code', null, ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Code Postal']) !!}
+                        </div>
+                        <div class="col-md-4 mb-3" style="display: none;">
+                            <label for="country" class="tw-text-gray-700 tw-font-medium mb-1 d-block"><i class="fas fa-globe tw-text-gray-400 tw-mr-1"></i> Pays:</label>
+                            {!! Form::text('country', 'Maroc', ['class' => 'form-control tw-border-gray-200', 'placeholder' => 'Pays']) !!}
+                        </div>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- Custom Fields Card -->
@@ -445,67 +381,85 @@
                 }
             </style>
 
-            <div class="card mb-4 border-0 shadow-sm">
-                <div class="card-header bg-light border-bottom-0 py-2">
-                    <h5 class="mb-0">Custom Fields</h5>
+            <!-- Ordonnance (Prescription) Card -->
+            <div class="card mb-4 border-0 shadow-sm tw-rounded-xl tw-overflow-hidden" id="ordonnance_card" style="display: none;">
+                <div class="card-header border-bottom-0 tw-bg-gradient-to-r tw-from-indigo-50 tw-to-white tw-px-6 tw-py-4">
+                    <h4 class="mb-0 tw-text-indigo-800 tw-font-bold"><i class="fas fa-glasses tw-text-indigo-500 tw-mr-2"></i> Initial Ordonnance (Prescription)</h4>
                 </div>
-                <div class="card-body p-4">
-                    <div class="container-fluid px-0">
-                        <!-- Row 1: V.L + EP -->
-                        <div class="custom-fields-row">
-                            <div class="col-md-6">
-                                <div class="custom-section h-100">
-                                    <span class="badge">V.L</span>
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="custom-label">OD</label>
-                                            {!! Form::text('custom_field1', null, ['class' => 'form-control form-control-sm']) !!}
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="custom-label">OG</label>
-                                            {!! Form::text('custom_field2', null, ['class' => 'form-control form-control-sm']) !!}
+                <div class="card-body tw-p-6">
+                    <div class="row">
+                        <!-- OS (Left Eye) Form -->
+                        <div class="col-md-6">
+                            <div class="custom-section h-100" style="background-color: #f6fcff; border-color: #cae8f5;">
+                                <h5 class="text-info" style="font-weight: 600;"><i class="far fa-eye"></i> OS - Left Eye (Oeil Gauche)</h5>
+                                <div class="row mt-3">
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('os_sphere', 'Sphere (SPH):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('os_sphere', null, ['class' => 'form-control form-control-sm', 'placeholder' => '-1.00']) !!}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="custom-section h-100">
-                                    <span class="badge">EP</span>
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="custom-label">EPD</label>
-                                            {!! Form::text('custom_field6', null, ['class' => 'form-control form-control-sm']) !!}
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('os_cylinder', 'Cylinder (CYL):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('os_cylinder', null, ['class' => 'form-control form-control-sm', 'placeholder' => '-0.50']) !!}
                                         </div>
-                                        <div class="col-6">
-                                            <label class="custom-label">EPG</label>
-                                            {!! Form::text('custom_field7', null, ['class' => 'form-control form-control-sm']) !!}
+                                    </div>
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('os_axis', 'Axis (AXE):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('os_axis', null, ['class' => 'form-control form-control-sm', 'placeholder' => '180']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('os_addition', 'Addition (ADD):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('os_addition', null, ['class' => 'form-control form-control-sm', 'placeholder' => '+2.00']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('os_pd', 'Pupillary Distance (PD):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('os_pd', null, ['class' => 'form-control form-control-sm', 'placeholder' => '32.5']) !!}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Row 2: ADD (centered and small) -->
-                        <div class="custom-fields-single-row">
-                            <div class="col-md-6">
-                                <div class="custom-section">
-                                    <span class="badge">ADD</span>
-                                    {!! Form::text('custom_field3', null, ['class' => 'form-control form-control-sm']) !!}
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Row 3: V.P (centered and small) -->
-                        <div class="custom-fields-single-row">
-                            <div class="col-md-6">
-                                <div class="custom-section">
-                                    <span class="badge">V.P</span>
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="custom-label">OD</label>
-                                            {!! Form::text('custom_field4', null, ['class' => 'form-control form-control-sm']) !!}
+
+                        <!-- OD (Right Eye) Form -->
+                        <div class="col-md-6">
+                            <div class="custom-section h-100" style="background-color: #fffaf0; border-color: #f7e0b5;">
+                                <h5 class="text-warning" style="font-weight: 600;"><i class="far fa-eye"></i> OD - Right Eye (Oeil Droit)</h5>
+                                <div class="row mt-3">
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('od_sphere', 'Sphere (SPH):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('od_sphere', null, ['class' => 'form-control form-control-sm', 'placeholder' => '-1.00']) !!}
                                         </div>
-                                        <div class="col-6">
-                                            <label class="custom-label">OG</label>
-                                            {!! Form::text('custom_field5', null, ['class' => 'form-control form-control-sm']) !!}
+                                    </div>
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('od_cylinder', 'Cylinder (CYL):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('od_cylinder', null, ['class' => 'form-control form-control-sm', 'placeholder' => '-0.50']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('od_axis', 'Axis (AXE):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('od_axis', null, ['class' => 'form-control form-control-sm', 'placeholder' => '180']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('od_addition', 'Addition (ADD):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('od_addition', null, ['class' => 'form-control form-control-sm', 'placeholder' => '+2.00']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group mb-0">
+                                            {!! Form::label('od_pd', 'Pupillary Distance (PD):', ['class' => 'custom-label']) !!}
+                                            {!! Form::text('od_pd', null, ['class' => 'form-control form-control-sm', 'placeholder' => '32.5']) !!}
                                         </div>
                                     </div>
                                 </div>
@@ -516,12 +470,12 @@
             </div>
 
             <!-- Buttons -->
-            <div class="d-flex justify-content-end mt-4 mb-3 gap-2">
-                <button type="submit" class="btn btn-minimalist btn-primary-minimalist">
-                    save
+            <div class="tw-flex tw-justify-end tw-gap-3 tw-mt-6 tw-mb-4">
+                <button type="button" class="tw-dw-btn tw-bg-gray-200 hover:tw-bg-gray-300 tw-text-gray-700 tw-border-none tw-rounded-lg tw-px-6" data-dismiss="modal">
+                    Fermer
                 </button>
-                <button type="button" class="btn btn-minimalist btn-cancel-minimalist" data-dismiss="modal">
-                    cancel
+                <button type="submit" class="tw-dw-btn tw-dw-btn-primary tw-text-white tw-rounded-lg tw-px-8 tw-shadow-md hover:tw-scale-105 tw-transition tw-duration-200">
+                    Enregistrer <i class="fas fa-check-circle tw-ml-2"></i>
                 </button>
             </div>
         {!! Form::close() !!}
@@ -539,9 +493,7 @@
         });
 
         // Then initialize other select2 elements
-        $('.select2').select2({
-            width: '100%'
-        });
+        $('.select2').select2({ width: '100%' });
 
         // Form validation
         $('#contact_add_form').validate({
@@ -549,19 +501,97 @@
                 first_name: "required",
                 type: "required",
                 mobile: "required",
-                'user_id[]': "required",
-                image: {
-                    extension: "jpg|jpeg|png|gif",
-                    filesize: 2000000 // 2MB
-                }
-            },
-            messages: {
-                image: {
-                    extension: "Please upload valid image file (jpg, jpeg, png, gif)",
-                    filesize: "File size must be less than 2MB"
-                }
+                'assigned_to_users[]': "required",
+                image: { extension: "jpg|jpeg|png|gif", filesize: 2000000 }
             }
         });
+
+        // ── Ordonnance toggle ─────────────────────────────────────
+        function toggleOrdonnance() {
+            var t = $('select#type').val();
+            if (t === 'customer' || t === 'both') {
+                $('#ordonnance_card').slideDown(180);
+            } else {
+                $('#ordonnance_card').slideUp(180);
+            }
+        }
+        toggleOrdonnance();
+        $('select#type').on('change', toggleOrdonnance);
+
+        // ── Smooth "Show More Details" expand with rotating arrow ─
+        var $toggleBtn = $('[data-target="#more_contact_info"], [data-bs-target="#more_contact_info"]');
+        var $arrowIcon = $toggleBtn.find('i.fas');
+        // Restore accordion state from sessionStorage
+        if (sessionStorage.getItem('more_contact_open') === '1') {
+            $('#more_contact_info').show();
+            $arrowIcon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+            $toggleBtn.find('span:last').text(' Masquer les détails supplémentaires');
+        }
+        // Convert Bootstrap collapse to jQuery slideToggle for smoother animation
+        $toggleBtn.off('click').on('click', function(e) {
+            e.preventDefault();
+            var $section = $('#more_contact_info');
+            if ($section.is(':visible')) {
+                $section.slideUp(220);
+                $arrowIcon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                $toggleBtn.find('span:last').text(' Afficher plus de détails (Adresse, Plafond, etc.)');
+                sessionStorage.setItem('more_contact_open', '0');
+            } else {
+                $section.slideDown(220, function() {
+                    $section.find('input:visible:not([disabled]):first').trigger('focus');
+                });
+                $arrowIcon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+                $toggleBtn.find('span:last').text(' Masquer les détails supplémentaires');
+                sessionStorage.setItem('more_contact_open', '1');
+            }
+        });
+
+        // ── Prescription: Enter key auto-advances to next field ───
+        // Ordered: OS SPH → CYL → AXE → ADD → PD → OD SPH → CYL → AXE → ADD → PD
+        var prescFields = [
+            'os_sphere','os_cylinder','os_axis','os_addition','os_pd',
+            'od_sphere','od_cylinder','od_axis','od_addition','od_pd'
+        ];
+        $.each(prescFields, function(i, name) {
+            $('[name="' + name + '"]').on('keydown', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    var next = prescFields[i + 1];
+                    if (next) { $('[name="' + next + '"]').trigger('focus').trigger('select'); }
+                }
+            });
+        });
+
+        // ── Alt+O: instantly expand ordonnance and focus SPH ─────
+        $(document).on('keydown', function(e) {
+            if (e.altKey && e.key.toLowerCase() === 'o') {
+                e.preventDefault();
+                $('#ordonnance_card').slideDown(150);
+                setTimeout(function() { $('[name="os_sphere"]').trigger('focus').trigger('select'); }, 160);
+            }
+            // ── Alt+X: clear all prescription fields ──────────────
+            if (e.altKey && e.key.toLowerCase() === 'x') {
+                e.preventDefault();
+                var prescFields = ['os_sphere','os_cylinder','os_axis','os_addition','os_pd',
+                                   'od_sphere','od_cylinder','od_axis','od_addition','od_pd'];
+                $.each(prescFields, function(i, name) {
+                    $('[name="' + name + '"]').val('');
+                });
+                $('[name="os_sphere"]').trigger('focus');
+            }
+        });
+
+        // ── Mobile field: auto-format as user types ───────────────
+        $('[name="mobile"]').on('input', function() {
+            var v = $(this).val().replace(/\D/g, '');
+            if (v.length > 10) v = v.slice(0, 10);
+            $(this).val(v);
+        });
+
+        // ── Contact type select: default to 'customer' instantly ──
+        if (!$('select#type').val()) {
+            $('select#type').val('customer').trigger('change');
+        }
     });
 </script>
 

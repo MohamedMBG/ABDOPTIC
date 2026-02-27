@@ -405,4 +405,12 @@ class Contact extends Authenticatable
     {
         return $this->belongsToMany(\App\User::class, 'user_contact_access');
     }
+
+    /**
+     * Get the prescriptions for the contact.
+     */
+    public function prescriptions()
+    {
+        return $this->hasMany(\App\Prescription::class);
+    }
 }

@@ -3,6 +3,29 @@
 
 @section('content')
 
+    <style>
+        .dash-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: linear-gradient(to bottom right, #ffffff, #f9fafb);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .dash-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .dash-icon-wrapper {
+            transition: all 0.3s ease;
+        }
+        .dash-card:hover .dash-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+        .glass-header {
+            background: linear-gradient(135deg, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+        }
+    </style>
+
     <div class="tw-pb-6 tw-bg-gradient-to-r tw-from-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-800 tw-to-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-900 xl:tw-pb-0 ">
         <div class="tw-px-5 tw-pt-3">
             {{-- <div class="sm:tw-flex sm:tw-items-center sm:tw-justify-between sm:tw-gap-12">
@@ -70,12 +93,10 @@
                         @if ($is_admin)
                             <div class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mt-6 sm:tw-grid-cols-2 xl:tw-grid-cols-4 sm:tw-gap-5">
                             
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw-translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                     <div class="tw-p-4 sm:tw-p-5">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0 tw-bg-sky-100 tw-text-sky-500">
+                                            <div class="dash-icon-wrapper tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0 tw-bg-sky-100 tw-text-sky-500">
                                                 <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -100,12 +121,10 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                     <div class="tw-p-4 sm:tw-p-5">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-green-500 tw-bg-green-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0">
+                                            <div class="dash-icon-wrapper tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-green-500 tw-bg-green-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0">
                                                 <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -134,12 +153,10 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                     <div class="tw-p-4 sm:tw-p-5">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-yellow-500 tw-bg-yellow-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
+                                            <div class="dash-icon-wrapper tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-yellow-500 tw-bg-yellow-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
                                                 <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -167,12 +184,10 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                     <div class="tw-p-4 sm:tw-p-5">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-red-500 tw-bg-red-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
+                                            <div class="dash-icon-wrapper tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-red-500 tw-bg-red-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
                                                 <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -220,12 +235,10 @@
                     <div class="tw-px-5 tw-isolate">
                         <div
                             class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mt-4 sm:tw-mt-6 sm:tw-grid-cols-2 xl:tw-grid-cols-4 sm:tw-gap-5">
-                            <div
-                                class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                 <div class="tw-p-4 sm:tw-p-5">
                                     <div class="tw-flex tw-items-center tw-gap-4">
-                                        <div
-                                            class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0 bg-sky-100 tw-text-sky-500">
+                                        <div class="dash-icon-wrapper tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0 bg-sky-100 tw-text-sky-500">
                                             <svg aria-hidden="true" class="tw-w-6 tw-h-6"
                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
                                                 stroke="currentColor" fill="none" stroke-linecap="round"
@@ -250,8 +263,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
+                                <div class="dash-card tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 tw-ring-gray-200">
                                 <div class="tw-p-4 sm:tw-p-5">
                                     <div class="tw-flex tw-items-center tw-gap-4">
                                         <div
@@ -372,7 +384,7 @@
                 @if (auth()->user()->can('sell.view') || auth()->user()->can('direct_sell.view'))
                     @if (!empty($all_locations))
                         <div
-                            class="tw-transition-all lg:tw-col-span-2 xl:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                            class="tw-transition-all lg:tw-col-span-2 xl:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                             <div class="tw-p-4 sm:tw-p-5">
                                 <div class="tw-flex tw-items-center tw-gap-2.5">
                                     <div
@@ -412,7 +424,7 @@
                     @endif --}}
                     @if (!empty($all_locations))
                         <div
-                            class="tw-transition-all lg:tw-col-span-2 xl:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                            class="tw-transition-all lg:tw-col-span-2 xl:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                             <div class="tw-p-4 sm:tw-p-5">
                                 <div class="tw-flex tw-items-center tw-gap-2.5">
                                     <div
@@ -451,7 +463,7 @@
                 @endif --}}
                 @if (auth()->user()->can('sell.view') || auth()->user()->can('direct_sell.view'))
                     <div
-                        class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -508,7 +520,7 @@
                 @endif
                 @can('purchase.view')
                     <div
-                        class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -565,7 +577,7 @@
                 @endcan
                 @can('stock_report.view')
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -617,7 +629,7 @@
                     </div>
                     @if (session('business.enable_product_expiry') == 1)
                         <div
-                            class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                            class="tw-transition-all lg:tw-col-span-1 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                             <div class="tw-p-4 sm:tw-p-5">
                                 <div class="tw-flex tw-items-center tw-gap-2.5">
                                     <div
@@ -670,7 +682,7 @@
                 @endcan
                 @if (auth()->user()->can('so.view_all') || auth()->user()->can('so.view_own'))
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -732,7 +744,7 @@
                     !empty($common_settings['enable_purchase_requisition']) &&
                         (auth()->user()->can('purchase_requisition.view_all') || auth()->user()->can('purchase_requisition.view_own')))
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -799,7 +811,7 @@
                         (auth()->user()->can('purchase_order.view_all') || auth()->user()->can('purchase_order.view_own')))
 
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -861,7 +873,7 @@
                         auth()->user()->can('access_shipping') ||
                         auth()->user()->can('access_own_shipping'))
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div
@@ -945,7 +957,7 @@
                 @endif
                 @if (auth()->user()->can('account.access') && config('constants.show_payments_recovered_today') == true)
                     <div
-                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md hover:tw--translate-y-0.5 tw-ring-gray-200">
+                        class="tw-transition-all lg:tw-col-span-2 tw-duration-200 tw-bg-white tw-shadow-sm tw-rounded-xl tw-ring-1 hover:tw-shadow-md tw-ring-gray-200 dash-card">
                         <div class="tw-p-4 sm:tw-p-5">
                             <div class="tw-flex tw-items-center tw-gap-2.5">
                                 <div

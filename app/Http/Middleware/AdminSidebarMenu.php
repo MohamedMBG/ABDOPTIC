@@ -415,6 +415,26 @@ class AdminSidebarMenu
                 )->order(30);
             }
 
+            // Optician Workflow Menu
+            if (auth()->user()->can('sell.view') || auth()->user()->can('sell.create')) {
+                $menu->dropdown(
+                    'Optician (Lab)',
+                    function ($sub) {
+                        $sub->url(
+                            action([\App\Http\Controllers\OpticianWorkflowController::class, 'index']),
+                            'Lab Workflow',
+                            ['icon' => '<i class="fas fa-microscope"></i>', 'active' => request()->segment(1) == 'optician-workflow']
+                        );
+                    },
+                    ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="tw-size-5 tw-shrink-0" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M8 4h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2z" />
+                    <path d="M8 14h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2z" />
+                    <path d="M12 10v4" />
+                  </svg>', 'id' => 'tour_optician']
+                )->order(32);
+            }
+
             //Stock transfer dropdown
             if (in_array('stock_transfers', $enabled_modules) && (auth()->user()->can('purchase.view') || auth()->user()->can('purchase.create') || auth()->user()->can('view_own_purchase'))) {
                 $menu->dropdown(
