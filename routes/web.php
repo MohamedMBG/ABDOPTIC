@@ -85,7 +85,7 @@ Route::middleware(['setData'])->group(function () {
         return view('welcome');
     });
 
-    Auth::routes();
+    Auth::routes(['register' => false]);
 
     Route::get('/business/register', [BusinessController::class, 'getRegister'])->name('business.getRegister');
     Route::post('/business/register', [BusinessController::class, 'postRegister'])->name('business.postRegister');
@@ -135,7 +135,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
 
     Route::resource('brands', BrandController::class);
 
-    Route::resource('payment-account', 'PaymentAccountController');
+    Route::resource('payment-account', AccountController::class);
 
     Route::resource('tax-rates', TaxRateController::class);
 
@@ -524,11 +524,6 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
 //     Route::post('orders', [SellPosController::class, 'placeOrdersApi']);
 // });
 
-//common route
-Route::middleware(['auth'])->group(function () {
-    Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-});
-
 Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone'])->group(function () {
     Route::get('/load-more-notifications', [HomeController::class, 'loadMoreNotifications']);
     Route::get('/get-total-unread', [HomeController::class, 'getTotalUnreadNotifications']);
@@ -545,21 +540,12 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone'])
         ->name('packing.downloadPdf');
     Route::get('/sells/invoice-url/{id}', [SellPosController::class, 'showInvoiceUrl']);
     Route::get('/show-notification/{id}', [HomeController::class, 'showNotification']);
+
+    //added routes for manual invoice
+    Route::get('/manual-invoice/create', [ManualSellController::class, 'create'])->name('manual.invoice.create');
+    Route::post('/manual-invoice', [ManualSellController::class, 'store'])->name('manual.invoice.store');
+    Route::get('/manual-invoice/get-number', [ManualSellController::class, 'getInvoiceNumber'])->name('manual.invoice.getNumber');
+
+    //updating image routes
+    Route::post('/contacts/{id}/delete-image', [ContactController::class, 'deleteImage'])->name('contacts.delete-image');
 });
-
-// //added routes for manual invoice
-// Route::get('/sells/manual', [App\Http\Controllers\ManualSellController::class, 'index'])->name('sells.manual');
-// Route::post('/sells/manual', [App\Http\Controllers\ManualSellController::class, 'store'])->name('sells.manual.store');
-// Route::get('/sells/manual/product-row', [App\Http\Controllers\ManualSellController::class, 'getProductRow'])->name('sells.manual.product_row');
-// Route::get('/sells/get-invoice-number', [App\Http\Controllers\ManualSellController::class, 'getInvoiceNumber'])->name('sells.get_invoice_number');
-// // Add these routes to your routes/web.php file
-// // Add these routes for the manual sell functionality
-// Route::get('/sells/manual', 'App\Http\Controllers\ManualSellController@create')->name('sells.manual');
-// Route::post('/sells/manual', 'App\Http\Controllers\ManualSellController@store')->name('sells.manual.store');
-
-Route::get('/manual-invoice/create', [ManualSellController::class, 'create'])->name('manual.invoice.create');
-Route::post('/manual-invoice', [ManualSellController::class, 'store'])->name('manual.invoice.store');
-Route::get('/manual-invoice/get-number', [ManualSellController::class, 'getInvoiceNumber'])->name('manual.invoice.getNumber');
-
-//updating image routes
-Route::post('/contacts/{id}/delete-image', [ContactController::class, 'deleteImage'])->name('contacts.delete-image');

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\System;
 use App\Utils\ModuleUtil;
+use Illuminate\Database\QueryException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
@@ -74,64 +75,53 @@ class AppServiceProvider extends ServiceProvider
         $asset_v = config('constants.asset_version', 1);
         View::share('asset_v', $asset_v);
 
-        // Share the list of modules enabled in sidebar
-        View::composer(
-            ['*'],
-            function ($view) {
-                $enabled_modules = ! empty(session('business.enabled_modules')) ? session('business.enabled_modules') : [];
+        $enabled_modules = ! empty(session('business.enabled_modules')) ? session('business.enabled_modules') : [];
+        $__is_pusher_enabled = Auth::check() ? isPusherEnabled() : false;
 
-                $__is_pusher_enabled = isPusherEnabled();
+        $additional_views = [];
+        $additional_html = '';
+        $__system_settings = [];
 
-                if (! Auth::check()) {
-                    $__is_pusher_enabled = false;
-                }
-
-                $view->with('enabled_modules', $enabled_modules);
-                $view->with('__is_pusher_enabled', $__is_pusher_enabled);
-            }
-        );
-
-        View::composer(
-            ['layouts.*'],
-            function ($view) {
-                if (isAppInstalled()) {
+        if (isAppInstalled()) {
+            try {
+                if (Schema::hasTable('system')) {
                     $keys = ['additional_js', 'additional_css'];
-                    $__system_settings = System::getProperties($keys, true);
+                    $__system_settings = System::getProperties($keys, true)->toArray();
+                }
+            } catch (QueryException $e) {
+                $__system_settings = [];
+            } catch (\Throwable $e) {
+                $__system_settings = [];
+            }
 
-                    //Get js,css from modules
-                    $moduleUtil = new ModuleUtil;
-                    $module_additional_script = $moduleUtil->getModuleData('get_additional_script');
-                    $additional_views = [];
-                    $additional_html = '';
-                    foreach ($module_additional_script as $key => $value) {
-                        if (! empty($value['additional_js'])) {
-                            if (isset($__system_settings['additional_js'])) {
-                                $__system_settings['additional_js'] .= $value['additional_js'];
-                            } else {
-                                $__system_settings['additional_js'] = $value['additional_js'];
-                            }
-                        }
-                        if (! empty($value['additional_css'])) {
-                            if (isset($__system_settings['additional_css'])) {
-                                $__system_settings['additional_css'] .= $value['additional_css'];
-                            } else {
-                                $__system_settings['additional_css'] = $value['additional_css'];
-                            }
-                        }
-                        if (! empty($value['additional_html'])) {
-                            $additional_html .= $value['additional_html'];
-                        }
-                        if (! empty($value['additional_views'])) {
-                            $additional_views = array_merge($additional_views, $value['additional_views']);
-                        }
-                    }
+            try {
+                $moduleUtil = new ModuleUtil;
+                $module_additional_script = $moduleUtil->getModuleData('get_additional_script');
+            } catch (\Throwable $e) {
+                $module_additional_script = [];
+            }
 
-                    $view->with('__additional_views', $additional_views);
-                    $view->with('__additional_html', $additional_html);
-                    $view->with('__system_settings', $__system_settings);
+            foreach ($module_additional_script as $value) {
+                if (! empty($value['additional_js'])) {
+                    $__system_settings['additional_js'] = ($__system_settings['additional_js'] ?? '').$value['additional_js'];
+                }
+                if (! empty($value['additional_css'])) {
+                    $__system_settings['additional_css'] = ($__system_settings['additional_css'] ?? '').$value['additional_css'];
+                }
+                if (! empty($value['additional_html'])) {
+                    $additional_html .= $value['additional_html'];
+                }
+                if (! empty($value['additional_views'])) {
+                    $additional_views = array_merge($additional_views, $value['additional_views']);
                 }
             }
-        );
+        }
+
+        View::share('enabled_modules', $enabled_modules);
+        View::share('__is_pusher_enabled', $__is_pusher_enabled);
+        View::share('__additional_views', $additional_views);
+        View::share('__additional_html', $additional_html);
+        View::share('__system_settings', $__system_settings);
 
         //This will fix "Specified key was too long; max key length is 767 bytes issue during migration"
         Schema::defaultStringLength(191);
