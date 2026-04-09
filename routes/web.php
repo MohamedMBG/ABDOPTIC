@@ -212,20 +212,6 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/sells/duplicate/{id}', 'SellController@duplicateSell');
     Route::get('/sells/drafts', 'SellController@getDrafts');
     Route::get('/sells/convert-to-draft/{id}', 'SellPosController@convertToInvoice');
-    Route::get('/sells/convert-to-proforma/{id}', 'SellPosController@convertToProforma');
-    Route::get('/sells/quotations', 'SellController@getQuotations');
-    Route::get('/sells/draft-dt', 'SellController@getDraftDatables');
-    Route::resource('sells', 'SellController')->except(['show']);
-    Route::get('/sells/copy-quotation/{id}', [SellPosController::class, 'copyQuotation']);
-
-    Route::post('/import-purchase-products', [PurchaseController::class, 'importPurchaseProducts']);
-    Route::post('/purchases/update-status', [PurchaseController::class, 'updateStatus']);
-    Route::get('/purchases/get_products', [PurchaseController::class, 'getProducts']);
-    Route::get('/purchases/get_suppliers', [PurchaseController::class, 'getSuppliers']);
-    Route::post('/purchases/get_purchase_entry_row', [PurchaseController::class, 'getPurchaseEntryRow']);
-    Route::post('/purchases/check_ref_number', [PurchaseController::class, 'checkRefNumber']);
-    Route::resource('purchases', PurchaseController::class)->except(['show']);
-
     Route::get('/toggle-subscription/{id}', [SellPosController::class, 'toggleRecurringInvoices']);
     Route::post('/sells/pos/get-types-of-service-details', [SellPosController::class, 'getTypesOfServiceDetails']);
     Route::get('/sells/subscriptions', [SellPosController::class, 'listSubscriptions']);
@@ -530,7 +516,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone'])
     Route::get('/purchases/print/{id}', [PurchaseController::class, 'printInvoice']);
     Route::get('/purchases/{id}', [PurchaseController::class, 'show']);
     Route::get('/download-purchase-order/{id}/pdf', [PurchaseOrderController::class, 'downloadPdf'])->name('purchaseOrder.downloadPdf');
-    Route::get('/sells/{id}', [SellController::class, 'show']);
+    Route::get('/sells/{id}', [SellController::class, 'show'])->name('sells.show');
     Route::get('/sells/{transaction_id}/print', [SellPosController::class, 'printInvoice'])->name('sell.printInvoice');
     Route::get('/sells/{transaction_id}/print-manual', [SellController::class, 'printManualInvoice'])->name('sell.printManualInvoice');
     Route::get('/download-sells/{transaction_id}/pdf', [SellPosController::class, 'downloadPdf'])->name('sell.downloadPdf');
