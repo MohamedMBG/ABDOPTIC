@@ -486,6 +486,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('get-document-note-page', [DocumentAndNoteController::class, 'getDocAndNoteIndexPage']);
     Route::post('post-document-upload', [DocumentAndNoteController::class, 'postMedia']);
     Route::resource('note-documents', DocumentAndNoteController::class);
+    Route::resource('purchases', PurchaseController::class)->except(['show']);
     Route::resource('purchase-order', PurchaseOrderController::class);
     Route::get('get-purchase-orders/{contact_id}', [PurchaseOrderController::class, 'getPurchaseOrders']);
     Route::get('get-purchase-order-lines/{purchase_order_id}', [PurchaseController::class, 'getPurchaseOrderLines']);
