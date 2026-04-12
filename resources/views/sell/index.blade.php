@@ -41,37 +41,50 @@
             @endif
         @endcomponent
         @component('components.widget', ['class' => 'box-primary', 'title' => __('lang_v1.all_sales')])
-            @can('direct_sell.access')
-                @slot('tool')
+            @slot('tool')
                 <div class="box-tools">
-        <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
-            href="{{ action([\App\Http\Controllers\SellController::class, 'create']) }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M12 5l0 14" />
-                <path d="M5 12l14 0" />
-            </svg> @lang('messages.add') 
-        </a>
-        
-        <!-- Add the Manual Invoice button right here -->
-        <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-green-600 tw-to-green-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right mr-2"
-           href="{{ url('/sells/manual') }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
-                <path d="M13.5 6.5l4 4" />
-            </svg> Manual Invoice
-        </a>
+                    @can('direct_sell.access')
+                        <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
+                            href="{{ action([\App\Http\Controllers\SellController::class, 'create']) }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M12 5l0 14" />
+                                <path d="M5 12l14 0" />
+                            </svg> @lang('messages.add')
+                        </a>
 
+                        <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-green-600 tw-to-green-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right mr-2"
+                            href="{{ url('/sells/manual') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+                                <path d="M13.5 6.5l4 4" />
+                            </svg> Manual Invoice
+                        </a>
+                    @endcan
 
-    </div>
-                    
-                @endslot
-            @endcan
+                    @if (in_array('pos_sale', $enabled_modules) && auth()->user()->can('sell.create'))
+                        <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-emerald-600 tw-to-teal-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right mr-2"
+                            href="{{ action([\App\Http\Controllers\SellPosController::class, 'create']) }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-cash-register">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M5 3h14v18h-14z" />
+                                <path d="M9 7h6" />
+                                <path d="M9 12h6" />
+                                <path d="M8 16h.01" />
+                                <path d="M12 16h.01" />
+                                <path d="M16 16h.01" />
+                            </svg> @lang('sale.pos_sale')
+                        </a>
+                    @endif
+                </div>
+            @endslot
             @if (auth()->user()->can('direct_sell.view') ||
                     auth()->user()->can('view_own_sell_only') ||
                     auth()->user()->can('view_commission_agent_sell'))
