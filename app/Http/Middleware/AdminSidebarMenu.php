@@ -312,7 +312,7 @@ class AdminSidebarMenu
                                 ['icon' => '', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == null]
                             );
                         }
-                        if (in_array('add_sale', $enabled_modules) && auth()->user()->can('direct_sell.access')) {
+                        if (in_array('add_sale', $enabled_modules) && (auth()->user()->can('direct_sell.access') || auth()->user()->can('sell.create'))) {
                             $sub->url(
                                 action([\App\Http\Controllers\SellController::class, 'create']),
                                 __('sale.add_sale'),

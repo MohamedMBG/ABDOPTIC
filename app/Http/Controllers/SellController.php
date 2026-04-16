@@ -648,7 +648,7 @@ class SellController extends Controller
                 abort(403, 'Unauthorized action.');
             }
         } else {
-            if (! auth()->user()->can('direct_sell.access')) {
+            if (! auth()->user()->can('direct_sell.access') && ! auth()->user()->can('sell.create')) {
                 abort(403, 'Unauthorized action.');
             }
         }

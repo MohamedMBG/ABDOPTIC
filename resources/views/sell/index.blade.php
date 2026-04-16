@@ -43,7 +43,7 @@
         @component('components.widget', ['class' => 'box-primary', 'title' => __('lang_v1.all_sales')])
             @slot('tool')
                 <div class="box-tools">
-                    @can('direct_sell.access')
+                    @if(auth()->user()->can('direct_sell.access') || auth()->user()->can('sell.create'))
                         <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-indigo-600 tw-to-blue-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right"
                             href="{{ action([\App\Http\Controllers\SellController::class, 'create']) }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -65,7 +65,7 @@
                                 <path d="M13.5 6.5l4 4" />
                             </svg> Manual Invoice
                         </a>
-                    @endcan
+                    @endif
 
                     @if (in_array('pos_sale', $enabled_modules) && auth()->user()->can('sell.create'))
                         <a class="tw-dw-btn tw-bg-gradient-to-r tw-from-emerald-600 tw-to-teal-500 tw-font-bold tw-text-white tw-border-none tw-rounded-full pull-right mr-2"
