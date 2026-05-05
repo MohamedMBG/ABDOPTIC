@@ -77,7 +77,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <input type="hidden" name="contact_id" value="{{ request()->segment(2) }}">
+                    <input type="hidden" name="contact_id" value="{{ $contact_id }}">
                     <!-- OS (Left Eye) Form -->
                     <div class="col-md-6">
                         <div class="box box-info">

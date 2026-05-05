@@ -3,9 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OpticianWorkflowController extends Controller
 {
+    protected function statuses()
+    {
+        return [
+            'prescription_received' => 'Prescription Received',
+            'lenses_ordered' => 'Lenses Ordered from Lab',
+            'in_assembly' => 'In Assembly',
+            'ready_for_pickup' => 'Ready for Pickup',
+            'delivered' => 'Delivered',
+        ];
+    }
+
     /**
      * Display the workflow dashboard/list.
      */
@@ -17,13 +29,7 @@ class OpticianWorkflowController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
 
-        $statuses = [
-            'prescription_received' => 'Prescription Received',
-            'lenses_ordered' => 'Lenses Ordered from Lab',
-            'in_assembly' => 'In Assembly',
-            'ready_for_pickup' => 'Ready for Pickup',
-            'delivered' => 'Delivered',
-        ];
+        $statuses = $this->statuses();
 
         // Fetch non-delivered optical orders
         $orders = \App\Transaction::where('business_id', $business_id)
@@ -34,7 +40,21 @@ class OpticianWorkflowController extends Controller
                         $q->whereNotNull('prescription_id')
                           ->orWhereNotNull('optician_status');
                     })
-                    ->with(['contact', 'sell_lines', 'sell_lines.product'])
+                    ->select([
+                        'id',
+                        'business_id',
+                        'contact_id',
+                        'invoice_no',
+                        'transaction_date',
+                        'updated_at',
+                        'prescription_id',
+                        'optician_status',
+                    ])
+                    ->with([
+                        'contact:id,name',
+                        'sell_lines:id,transaction_id,product_id,quantity',
+                        'sell_lines.product:id,name',
+                    ])
                     ->orderBy('transaction_date', 'desc')
                     ->get();
 
@@ -52,6 +72,11 @@ class OpticianWorkflowController extends Controller
 
         try {
             $business_id = $request->session()->get('user.business_id');
+            $statuses = array_keys($this->statuses());
+            $request->validate([
+                'optician_status' => ['required', Rule::in($statuses)],
+                'notes' => ['nullable', 'string'],
+            ]);
             $status = $request->input('optician_status');
             $notes = $request->input('notes');
 
@@ -97,16 +122,13 @@ class OpticianWorkflowController extends Controller
         $transaction = \App\Transaction::where('business_id', $business_id)
                                 ->findOrFail($id);
 
-        $statuses = [
-            'prescription_received' => 'Prescription Received',
-            'lenses_ordered' => 'Lenses Ordered from Lab',
-            'in_assembly' => 'In Assembly',
-            'ready_for_pickup' => 'Ready for Pickup',
-            'delivered' => 'Delivered',
-        ];
+        $statuses = $this->statuses();
 
         // Fetch history
         $histories = \App\OpticianStatusHistory::where('transaction_id', $id)
+                        ->whereHas('transaction', function ($query) use ($business_id) {
+                            $query->where('business_id', $business_id);
+                        })
                         ->with(['user'])
                         ->orderBy('created_at', 'desc')
                         ->get();

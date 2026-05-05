@@ -45,7 +45,12 @@
 
             {{-- When using superadmin, this button is used to switch users --}}
             @if(!empty(session('previous_user_id')) && !empty(session('previous_username')))
-                <a href="{{route('sign-in-as-user', session('previous_user_id'))}}" class="btn btn-flat btn-danger m-8 btn-sm mt-10"><i class="fas fa-undo"></i> @lang('lang_v1.back_to_username', ['username' => session('previous_username')] )</a>
+                <form method="POST" action="{{ route('sign-in-as-user', session('previous_user_id')) }}" class="tw-inline-block">
+                    @csrf
+                    <button type="submit" class="btn btn-flat btn-danger m-8 btn-sm mt-10">
+                        <i class="fas fa-undo"></i> @lang('lang_v1.back_to_username', ['username' => session('previous_username')])
+                    </button>
+                </form>
             @endif
 
 

@@ -15,6 +15,7 @@ use App\Exceptions\AdvanceBalanceNotAvailable;
 use App\Exceptions\PurchaseSellMismatch;
 use App\InvoiceScheme;
 use App\Product;
+use App\Prescription;
 use App\PurchaseLine;
 use App\Restaurant\ResTable;
 use App\TaxRate;
@@ -61,6 +62,7 @@ class TransactionUtil extends Util
         // Check if optical products or prescription exists
         $optician_status = null;
         if (!empty($input['prescription_id'])) {
+           $this->validatePrescriptionForContact($business_id, $input['contact_id'], $input['prescription_id']);
            $optician_status = 'prescription_received';
         } else if (!empty($input['products'])) {
             $product_ids = array_column($input['products'], 'product_id');
@@ -93,7 +95,7 @@ class TransactionUtil extends Util
             'discount_amount' => $uf_data ? $this->num_uf($input['discount_amount']) : $input['discount_amount'],
             'tax_amount' => $invoice_total['tax'],
             'final_total' => $final_total,
-            'additional_notes' => ! empty($input['sale_note']) ? $input['sale_note'] : null,
+            'additional_notes' => ! empty($input['sale_note']) ? $input['sale_note'] : (! empty($input['additional_notes']) ? $input['additional_notes'] : null),
             'staff_note' => ! empty($input['staff_note']) ? $input['staff_note'] : null,
             'created_by' => $user_id,
             'document' => ! empty($input['document']) ? $input['document'] : null,
@@ -210,6 +212,7 @@ class TransactionUtil extends Util
         $optician_status = $transaction->optician_status;
         $prescription_id = $transaction->prescription_id;
         if (!empty($input['prescription_id'])) {
+           $this->validatePrescriptionForContact($business_id, $input['contact_id'], $input['prescription_id']);
            $optician_status = $optician_status ?: 'prescription_received';
            $prescription_id = $input['prescription_id'];
         } else if (!empty($input['products']) && empty($optician_status)) {
@@ -2414,6 +2417,51 @@ class TransactionUtil extends Util
         }
     }
 
+    public function previewInvoiceNumber($business_id, $status, $location_id, $invoice_scheme_id = null, $sale_type = null)
+    {
+        if ($status == 'final') {
+            if (empty($invoice_scheme_id)) {
+                $scheme = $this->getInvoiceScheme($business_id, $location_id);
+            } else {
+                $scheme = InvoiceScheme::where('business_id', $business_id)
+                    ->find($invoice_scheme_id);
+            }
+
+            if ($scheme->scheme_type == 'blank') {
+                $prefix = $scheme->prefix;
+            } else {
+                $prefix = $scheme->prefix . date('Y') . config('constants.invoice_scheme_separator');
+            }
+
+            if ($scheme->number_type == 'sequential') {
+                $count = $scheme->start_number + $scheme->invoice_count;
+            } elseif ($scheme->number_type == 'random') {
+                $max = (int) str_pad(1, $scheme->total_digits, '1');
+                $count = rand(1000, 9 * $max);
+            }
+
+            $count = str_pad($count, $scheme->total_digits, '0', STR_PAD_LEFT);
+
+            return $prefix . $count;
+        } elseif ($status == 'draft') {
+            $ref = ReferenceCount::where('ref_type', 'draft')
+                ->where('business_id', $business_id)
+                ->first();
+            $next_count = ! empty($ref) ? $ref->ref_count + 1 : 1;
+
+            return $this->generateReferenceNumber('draft', $next_count, $business_id);
+        } elseif ($sale_type == 'sales_order') {
+            $ref = ReferenceCount::where('ref_type', 'sales_order')
+                ->where('business_id', $business_id)
+                ->first();
+            $next_count = ! empty($ref) ? $ref->ref_count + 1 : 1;
+
+            return $this->generateReferenceNumber('sales_order', $next_count, $business_id);
+        }
+
+        return Str::random(5);
+    }
+
     private function getInvoiceScheme($business_id, $location_id)
     {
         $scheme_id = BusinessLocation::where('business_id', $business_id)
@@ -2432,6 +2480,17 @@ class TransactionUtil extends Util
         }
 
         return $scheme;
+    }
+
+    protected function validatePrescriptionForContact($business_id, $contact_id, $prescription_id)
+    {
+        $prescription = Prescription::where('business_id', $business_id)
+            ->where('contact_id', $contact_id)
+            ->find($prescription_id);
+
+        if (empty($prescription)) {
+            throw new \InvalidArgumentException('The selected prescription does not belong to the selected customer.');
+        }
     }
 
     /**

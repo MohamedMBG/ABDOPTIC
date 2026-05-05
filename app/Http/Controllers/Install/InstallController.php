@@ -40,8 +40,6 @@ class InstallController extends Controller
             include_once __DIR__.'/MacActivationKeyChecker.php';
             $this->macActivationKeyChecker = $mac_is_enabled;
         }
-
-        $this->installSettings();
     }
 
     /**
@@ -49,7 +47,6 @@ class InstallController extends Controller
      */
     private function installSettings()
     {
-        config(['app.debug' => true]);
         Artisan::call('config:clear');
         Artisan::call('cache:clear');
     }

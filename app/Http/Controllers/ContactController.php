@@ -701,6 +701,7 @@ class ContactController extends Controller
         
         if (in_array($input['type'], ['customer', 'both']) && !empty($has_prescription)) {
             $prescription_data['contact_id'] = $output['data']->id;
+            $prescription_data['business_id'] = $business_id;
             $prescription_data['created_by'] = $request->session()->get('user.id');
             $prescription_data['notes'] = 'Initial prescription added during customer creation.';
             \App\Prescription::create($prescription_data);
@@ -747,7 +748,26 @@ class ContactController extends Controller
         }
 
         $business_id = request()->session()->get('user.business_id');
-        $contact = $this->contactUtil->getContactInfo($business_id, $id);
+        if (request()->ajax()) {
+            $contact = Contact::where('business_id', $business_id)
+                ->where('id', $id)
+                ->select([
+                    'id',
+                    'name',
+                    'type',
+                    'created_by',
+                    'mobile',
+                    'address_line_1',
+                    'address_line_2',
+                    'city',
+                    'state',
+                    'country',
+                    'zip_code',
+                ])
+                ->firstOrFail();
+        } else {
+            $contact = $this->contactUtil->getContactInfo($business_id, $id);
+        }
 
         $is_selected_contacts = User::isSelectedContacts(auth()->user()->id);
         $user_contacts = [];
@@ -764,6 +784,22 @@ class ContactController extends Controller
             if ($contact->created_by != auth()->user()->id & ! in_array($contact->id, $user_contacts)) {
                 abort(403, 'Unauthorized action.');
             }
+        }
+
+        if (request()->ajax()) {
+            return response()->json([
+                'id' => $contact->id,
+                'name' => $contact->name,
+                'mobile' => $contact->mobile,
+                'address' => implode(', ', array_filter([
+                    $contact->address_line_1,
+                    $contact->address_line_2,
+                    $contact->city,
+                    $contact->state,
+                    $contact->country,
+                    $contact->zip_code,
+                ])),
+            ]);
         }
 
         $reward_enabled = (request()->session()->get('business.enable_rp') == 1 && in_array($contact->type, ['customer', 'both'])) ? true : false;
@@ -973,6 +1009,10 @@ class ContactController extends Controller
     public function deleteImage($id)
     {
         try {
+            if (! auth()->user()->can('customer.update')) {
+                abort(403, 'Unauthorized action.');
+            }
+
             $business_id = request()->session()->get('user.business_id');
             $contact = Contact::where('business_id', $business_id)->findOrFail($id);
 
@@ -1117,7 +1157,10 @@ class ContactController extends Controller
             if (request()->session()->get('business.enable_rp') == 1) {
                 $contacts->addSelect('total_rp');
             }
-            $contacts = $contacts->get();
+            $contacts = $contacts
+                ->orderBy('contacts.name')
+                ->limit(20)
+                ->get();
 
             return json_encode($contacts);
         }

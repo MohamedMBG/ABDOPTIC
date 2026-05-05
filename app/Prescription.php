@@ -15,6 +15,7 @@ class Prescription extends Model
      * @var array
      */
     protected $fillable = [
+        'business_id',
         'contact_id',
         'od_sphere',
         'od_cylinder',

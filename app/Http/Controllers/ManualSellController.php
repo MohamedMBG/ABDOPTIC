@@ -17,6 +17,7 @@ use App\ProductVariation;
 use App\BusinessLocation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Validation\Rule;
 
 class ManualSellController extends Controller
 {
@@ -78,15 +79,25 @@ class ManualSellController extends Controller
             'products' => 'required|array|min:1',
             'products.*.price' => 'required|numeric|min:0',
             'products.*.quantity' => 'required|numeric|min:1',
-            'contact_id' => 'nullable|exists:contacts,id',
+            'contact_id' => [
+                'nullable',
+                Rule::exists('contacts', 'id')->where(function ($query) use ($request) {
+                    $query->where('business_id', $request->session()->get('user.business_id'))
+                        ->whereIn('type', ['customer', 'both']);
+                }),
+            ],
+            'invoice_number' => 'nullable|string|max:255',
             'customer_name' => 'required_if:contact_id,null|string|max:255',
-            'mobile' => 'nullable|string|max:20'
+            'mobile' => 'nullable|string|max:20',
+            'discount_type' => 'nullable|in:percentage,fixed',
+            'discount_amount' => 'nullable|numeric|min:0',
         ]);
 
         try {
             $input = $request->except('_token');
             $business_id = $request->session()->get('user.business_id');
             $user_id = $request->session()->get('user.id');
+            $input['invoice_number'] = $this->resolveInvoiceNumber($input['invoice_number'] ?? null, $business_id);
 
             DB::beginTransaction();
 
@@ -185,7 +196,10 @@ class ManualSellController extends Controller
             throw new \Exception("Customer name is required if not selecting an existing customer.");
         }
 
-        return $contact_id;
+        return Contact::where('business_id', $business_id)
+            ->whereIn('type', ['customer', 'both'])
+            ->findOrFail($contact_id)
+            ->id;
     }
 
     protected function prepareTransactionData($input, $business_id, $user_id, $contact_id, $location_id)
@@ -206,6 +220,10 @@ class ManualSellController extends Controller
         $final_total = $final_total * (1 - ($discount_amount/100));
     } elseif ($discount_type == 'fixed') {
         $final_total = $final_total - $discount_amount;
+    }
+
+    if ($final_total < 0) {
+        throw new \InvalidArgumentException('Final total cannot be negative.');
     }
 
     // Format transaction date
@@ -382,10 +400,23 @@ class ManualSellController extends Controller
         }
 
         $business_id = request()->session()->get('user.business_id');
-        $ref_count = $this->transactionUtil->setAndGetReferenceCount('sell');
-        $invoice_no = $this->transactionUtil->generateReferenceNumber('sell', $ref_count);
+        $default_location = BusinessLocation::where('business_id', $business_id)->firstOrFail();
+        $invoice_no = $this->transactionUtil->previewInvoiceNumber($business_id, 'final', $default_location->id);
 
         return response()->json(['invoice_number' => $invoice_no]);
+    }
+
+    protected function resolveInvoiceNumber($invoice_number, $business_id)
+    {
+        if (empty($invoice_number)) {
+            return null;
+        }
+
+        $exists = Transaction::where('business_id', $business_id)
+            ->where('invoice_no', $invoice_number)
+            ->exists();
+
+        return $exists ? null : $invoice_number;
     }
 }
 

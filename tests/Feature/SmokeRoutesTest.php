@@ -52,4 +52,11 @@ class SmokeRoutesTest extends TestCase
 
         $response->assertStatus(405);
     }
+
+    public function test_sign_in_as_user_route_only_allows_post_requests()
+    {
+        $response = $this->get('/sign-in-as-user/1');
+
+        $response->assertStatus(405);
+    }
 }

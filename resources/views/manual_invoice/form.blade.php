@@ -395,7 +395,7 @@
 
         // Generate invoice number
         $.ajax({
-            url: '/sells/get-invoice-number',
+            url: "{{ route('manual.invoice.getNumber') }}",
             dataType: 'json',
             success: function(data) {
                 $('#invoice_number').val(data.invoice_number);
@@ -453,14 +453,31 @@
             calculateTotal();
         });
 
+        $(document).on('input change', '#discount_amount, #discount_type', function() {
+            calculateTotal();
+        });
+
         // Calculate total amount
         function calculateTotal() {
-            var total = 0;
+            var grossTotal = 0;
             $('.subtotal').each(function() {
-                total += parseFloat($(this).text()) || 0;
+                grossTotal += parseFloat($(this).text()) || 0;
             });
-            $('#total_amount').text(total.toFixed(2));
-            $('#final_total').val(total);
+
+            var discountType = $('#discount_type').val();
+            var discountAmount = parseFloat($('#discount_amount').val()) || 0;
+            var finalTotal = grossTotal;
+
+            if (discountType === 'percentage' && discountAmount > 0) {
+                finalTotal = grossTotal * (1 - (discountAmount / 100));
+            } else if (discountType === 'fixed' && discountAmount > 0) {
+                finalTotal = grossTotal - discountAmount;
+            }
+
+            finalTotal = Math.max(finalTotal, 0);
+
+            $('#total_amount').text(finalTotal.toFixed(2));
+            $('#final_total').val(finalTotal.toFixed(2));
         }
 
         // Cancel button action

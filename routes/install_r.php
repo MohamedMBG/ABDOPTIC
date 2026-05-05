@@ -19,5 +19,7 @@ Route::post('/install/post-details', [Install\InstallController::class, 'postDet
 Route::post('/install/install-alternate', [Install\InstallController::class, 'installAlternate'])->name('install.installAlternate');
 Route::get('/install/success', [Install\InstallController::class, 'success'])->name('install.success');
 
-Route::get('/install/update', [Install\InstallController::class, 'updateConfirmation'])->name('install.updateConfirmation');
-Route::post('/install/update', [Install\InstallController::class, 'update'])->name('install.update');
+Route::middleware(['auth', 'superadmin'])->group(function () {
+    Route::get('/install/update', [Install\InstallController::class, 'updateConfirmation'])->name('install.updateConfirmation');
+    Route::post('/install/update', [Install\InstallController::class, 'update'])->name('install.update');
+});
