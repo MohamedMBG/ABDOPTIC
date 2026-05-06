@@ -219,6 +219,15 @@
 </div>
 </details>
 @endif
+
+@include('sell.partials.eye_measurement_fields', [
+    'details_class' => 'simple-pos-advanced',
+    'title' => 'Mesures des yeux',
+    'help_class' => 'simple-pos-help simple-pos-help-advanced',
+    'input_class' => 'form-control',
+    'textarea_class' => 'form-control',
+    'column_class' => 'col-md-6',
+])
 </div>
 <!-- include module fields -->
 @if(!empty($pos_module_data))

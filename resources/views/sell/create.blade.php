@@ -226,10 +226,6 @@
 						</div>
 					</div>
 				</div>
-
-				
-
-
 				@if(!empty($status))
 					<input type="hidden" name="status" id="status" value="{{$status}}">
 
@@ -245,6 +241,10 @@
 						</div>
 					</div>
 				@endif
+				<div class="clearfix"></div>
+				<div class="col-sm-12">
+					@include('sell.partials.eye_measurement_fields')
+				</div>
 				<div class="clearfix"></div>
 				<details class="simple-sale-details simple-sale-advanced-box">
 					<summary>Options avancees</summary>

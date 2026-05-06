@@ -37,6 +37,7 @@ use App\CustomerGroup;
 use App\InvoiceLayout;
 use App\InvoiceScheme;
 use App\Media;
+use App\Prescription;
 use App\Product;
 use App\SellingPriceGroup;
 use App\TaxRate;
@@ -731,6 +732,8 @@ class SellPosController extends Controller
 
                 $this->transactionUtil->activityLog($transaction, 'added');
 
+                $this->storePrescriptionFromSale($request, $transaction);
+
                 DB::commit();
 
                 SellCreatedOrModified::dispatch($transaction);
@@ -909,6 +912,45 @@ class SellPosController extends Controller
         }
 
         return $output;
+    }
+
+    protected function storePrescriptionFromSale(Request $request, Transaction $transaction): void
+    {
+        $prescription_data = $request->only([
+            'od_sphere', 'od_cylinder', 'od_axis', 'od_addition', 'od_pd',
+            'os_sphere', 'os_cylinder', 'os_axis', 'os_addition', 'os_pd',
+        ]);
+        $prescription_notes = $request->input('prescription_notes');
+
+        $has_prescription = collect($prescription_data)->contains(function ($value) {
+            return !is_null($value) && trim((string) $value) !== '';
+        });
+
+        if (!$has_prescription || empty($transaction->contact_id)) {
+            return;
+        }
+
+        $contact = Contact::where('business_id', $transaction->business_id)
+            ->where('id', $transaction->contact_id)
+            ->whereIn('type', ['customer', 'both'])
+            ->first();
+
+        if (empty($contact)) {
+            return;
+        }
+
+        if (!empty($contact->is_default)) {
+            return;
+        }
+
+        $prescription_data['business_id'] = $transaction->business_id;
+        $prescription_data['contact_id'] = $contact->id;
+        $prescription_data['created_by'] = $request->session()->get('user.id');
+        $prescription_data['notes'] = !empty($prescription_notes)
+            ? $prescription_notes
+            : 'Prescription added from sale #' . $transaction->invoice_no . '.';
+
+        Prescription::create($prescription_data);
     }
 
     /**
