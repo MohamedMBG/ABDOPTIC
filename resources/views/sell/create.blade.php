@@ -20,6 +20,7 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">{{$title}}</h1>
+    <p class="simple-sale-page-intro">Choisissez le client, ajoutez les produits, puis terminez avec le total et le paiement.</p>
 </section>
 <!-- Main content -->
 <section class="content no-print simple-sale-page">
@@ -62,6 +63,13 @@
 	<div class="row">
 		<div class="col-md-12 col-sm-12">
 			@component('components.widget', ['class' => 'box-solid'])
+				<div class="simple-sale-section-head">
+					<div class="simple-sale-step">1</div>
+					<div>
+						<h2 class="simple-sale-section-title">Client et vente</h2>
+						<p class="simple-sale-section-help">Commencez par les champs indispensables. Les options secondaires restent repliées.</p>
+					</div>
+				</div>
 				{!! Form::hidden('location_id', !empty($default_location) ? $default_location->id : null , ['id' => 'location_id', 'data-receipt_printer_type' => !empty($default_location->receipt_printer_type) ? $default_location->receipt_printer_type : 'browser', 'data-default_payment_accounts' => !empty($default_location) ? $default_location->default_payment_accounts : '']); !!}
 
 				@php
@@ -170,7 +178,7 @@
 						<small class="text-danger hide contact_due_text"><strong>@lang('account.customer_due'):</strong> <span></span></small>
 					</div>
 					<details class="simple-sale-details">
-						<summary>Adresses du client</summary>
+					<summary>Adresse client</summary>
 						<div class="simple-sale-addresses">
 							<strong>@lang('lang_v1.billing_address'):</strong>
 							<div id="billing_address_div">
@@ -181,7 +189,7 @@
 				</div>
 
 				<details class="simple-sale-details simple-sale-advanced-box">
-					<summary>Paiement et options client</summary>
+					<summary>Options client</summary>
 					<p class="simple-sale-help">Affichez ces champs seulement si la vente a des conditions particulieres.</p>
 				<div class="col-md-4 simple-sale-advanced-field">
 		          <div class="form-group">
@@ -381,6 +389,13 @@
 			@endcomponent
 
 			@component('components.widget', ['class' => 'box-solid'])
+				<div class="simple-sale-section-head">
+					<div class="simple-sale-step">2</div>
+					<div>
+						<h2 class="simple-sale-section-title">Produits</h2>
+						<p class="simple-sale-section-help">Recherchez un produit, ajoutez-le, puis ajustez seulement ce qui change.</p>
+					</div>
+				</div>
 				<div class="col-sm-10 col-sm-offset-1">
 					<div class="form-group">
 						{!! Form::label('search_product', __('sale.product') . ':', ['class' => 'simple-sale-label']) !!}
@@ -404,7 +419,9 @@
 						<h3 class="simple-sale-subtitle">Produits existants</h3>
 						<p class="simple-sale-help">Cliquez sur un produit existant pour l'ajouter rapidement a la vente.</p>
 					</div>
-					<div class="row">
+					<details class="simple-sale-filter-details">
+						<summary>Filtres produits</summary>
+						<div class="row">
 						@if(!empty($categories))
 							<div class="col-sm-6">
 								<div class="form-group">
@@ -431,7 +448,8 @@
 								</div>
 							</div>
 						@endif
-					</div>
+						</div>
+					</details>
 					<input type="hidden" id="suggestion_page" value="1">
 					<div class="simple-sale-product-grid-wrap">
 						<div class="row eq-height-row" id="product_list_body"></div>
@@ -494,7 +512,7 @@
 					</table>
 					</div>
 					<div class="table-responsive">
-					<table class="table table-condensed table-bordered table-striped">
+					<table class="table table-condensed table-bordered table-striped simple-sale-cart-summary">
 						<tr>
 							<td>
 								<div class="pull-right">
@@ -511,6 +529,13 @@
 				</div>
 			@endcomponent
 			@component('components.widget', ['class' => 'box-solid'])
+				<div class="simple-sale-section-head">
+					<div class="simple-sale-step">3</div>
+					<div>
+						<h2 class="simple-sale-section-title">Totaux et notes</h2>
+						<p class="simple-sale-section-help">Finalisez la remise, la taxe et les remarques avant le paiement.</p>
+					</div>
+				</div>
 				<div class="col-md-4  @if($sale_type == 'sales_order') hide @endif">
 			        <div class="form-group">
 			            {!! Form::label('discount_type', __('sale.discount_type') . ':*' ) !!}
@@ -697,6 +722,13 @@
 	@if((empty($status) || (!in_array($status, ['quotation', 'draft'])) || $is_enabled_download_pdf) && $sale_type != 'sales_order')
 		@can('sell.payments')
 			@component('components.widget', ['class' => 'box-solid', 'id' => $payment_body_id, 'title' => __('purchase.add_payment')])
+			<div class="simple-sale-section-head simple-sale-section-head-compact">
+				<div class="simple-sale-step">4</div>
+				<div>
+					<h2 class="simple-sale-section-title">Paiement</h2>
+					<p class="simple-sale-section-help">Choisissez le mode de paiement et vérifiez le solde restant.</p>
+				</div>
+			</div>
 			@if($is_enabled_download_pdf)
 				<div class="well row">
 					<div class="col-md-6">
@@ -840,6 +872,14 @@
 		--sale-text: #1f2937;
 		--sale-muted: #6b7280;
 		--sale-bg: #f7f8fa;
+		--sale-accent: #111827;
+		--sale-soft: #f8fafc;
+	}
+
+	.simple-sale-page-intro {
+		margin: 8px 0 0;
+		color: var(--sale-muted);
+		font-size: 14px;
 	}
 
 	.simple-sale-page.content {
@@ -856,6 +896,47 @@
 
 	.simple-sale-page .box-body {
 		padding: 24px 24px 20px;
+	}
+
+	.simple-sale-page .simple-sale-section-head {
+		display: flex;
+		align-items: flex-start;
+		gap: 14px;
+		margin-bottom: 22px;
+		padding-bottom: 18px;
+		border-bottom: 1px solid #eef2f7;
+	}
+
+	.simple-sale-page .simple-sale-section-head-compact {
+		margin-bottom: 18px;
+	}
+
+	.simple-sale-page .simple-sale-step {
+		width: 34px;
+		height: 34px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		background: var(--sale-accent);
+		color: #fff;
+		font-size: 14px;
+		font-weight: 700;
+		flex: 0 0 34px;
+	}
+
+	.simple-sale-page .simple-sale-section-title {
+		margin: 0 0 4px;
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--sale-text);
+	}
+
+	.simple-sale-page .simple-sale-section-help {
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--sale-muted);
 	}
 
 	.simple-sale-page .row {
@@ -1027,6 +1108,29 @@
 		background: #fbfcfd;
 	}
 
+	.simple-sale-page .simple-sale-filter-details {
+		margin-bottom: 14px;
+		padding: 12px 14px;
+		border: 1px dashed var(--sale-border);
+		border-radius: 14px;
+		background: #fff;
+	}
+
+	.simple-sale-page .simple-sale-filter-details summary {
+		cursor: pointer;
+		font-weight: 700;
+		color: var(--sale-text);
+		list-style: none;
+	}
+
+	.simple-sale-page .simple-sale-filter-details summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.simple-sale-page .simple-sale-filter-details[open] .row {
+		margin-top: 14px;
+	}
+
 	.simple-sale-page .simple-sale-product-browser-header {
 		margin-bottom: 18px;
 	}
@@ -1051,6 +1155,11 @@
 		vertical-align: middle;
 	}
 
+	.simple-sale-page .simple-sale-cart-summary td {
+		background: var(--sale-soft);
+		font-size: 15px;
+	}
+
 	.simple-sale-page .table-responsive + .table-responsive {
 		margin-top: 16px;
 	}
@@ -1070,6 +1179,10 @@
 	}
 
 	@media (max-width: 767px) {
+		.simple-sale-page .simple-sale-section-head {
+			align-items: center;
+		}
+
 		.simple-sale-page .box-body {
 			padding: 18px 16px 14px;
 		}
