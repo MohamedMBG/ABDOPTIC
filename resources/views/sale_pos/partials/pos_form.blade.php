@@ -1,6 +1,10 @@
+<div class="simple-pos-panel tw-mb-4">
+	<h2 class="simple-pos-page-heading">Client et recherche produit</h2>
 <div class="row">
 	<div class="col-md-4">
 		<div class="form-group">
+			<label class="simple-pos-label" for="customer_id">Client</label>
+			<p class="simple-pos-help">Choisissez le client avant d'ajouter les articles.</p>
 			<div class="input-group">
 				<span class="input-group-addon">
 					<i class="fa fa-user"></i>
@@ -18,7 +22,7 @@
 				value="{{ $walk_in_customer['selling_price_group_id'] ?? ''}}" >
 				@endif
 				{!! Form::select('contact_id', 
-					[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Enter Customer name / phone', 'required']); !!}
+					[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Nom ou telephone du client', 'required']); !!}
 				<span class="input-group-btn">
 					<button type="button" class="btn btn-default bg-white btn-flat add_new_customer" data-name=""  @if(!auth()->user()->can('customer.create')) disabled @endif><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
 				</span>
@@ -28,12 +32,14 @@
 	</div>
 	<div class="col-md-8">
 		<div class="form-group">
+			<label class="simple-pos-label" for="search_product">Produit</label>
+			<p class="simple-pos-help">Scannez ou tapez le nom du produit pour l'ajouter rapidement.</p>
 			<div class="input-group">
 				<div class="input-group-btn">
 					<button type="button" class="btn btn-default bg-white btn-flat" data-toggle="modal" data-target="#configure_search_modal" title="{{__('lang_v1.configure_product_search')}}"><i class="fas fa-search-plus"></i></button>
 				</div>
                 {{-- Removed mousetrap class as it was causing issue with barcode scanning --}}
-				{!! Form::text('search_product', null, ['class' => 'form-control', 'id' => 'search_product', 'placeholder' => __('lang_v1.search_product_placeholder'),
+				{!! Form::text('search_product', null, ['class' => 'form-control', 'id' => 'search_product', 'placeholder' => 'Rechercher ou scanner un produit',
 				'disabled' => is_null($default_location)? true : false,
 				'autofocus' => is_null($default_location)? false : true,
 				]); !!}
@@ -52,6 +58,23 @@
 		</div>
 	</div>
 </div>
+@php
+	$hasAdvancedPosOptions = !empty($pos_settings['show_invoice_layout'])
+		|| !empty($commission_agent)
+		|| !empty($pos_settings['enable_transaction_date'])
+		|| config('constants.enable_sell_in_diff_currency') == true
+		|| (!empty($price_groups) && count($price_groups) > 1)
+		|| (in_array('types_of_service', $enabled_modules) && !empty($types_of_service))
+		|| !empty($pos_settings['show_invoice_scheme'])
+		|| in_array('subscription', $enabled_modules)
+		|| in_array('tables', $enabled_modules)
+		|| in_array('service_staff', $enabled_modules)
+		|| in_array('kitchen', $enabled_modules);
+@endphp
+@if($hasAdvancedPosOptions)
+<details class="simple-pos-advanced">
+	<summary>Options avancees</summary>
+	<p class="simple-pos-help simple-pos-help-advanced">Affichez seulement ces champs si vous avez besoin d'un reglage supplementaire pour la vente.</p>
 <div class="row">
 	@if(!empty($pos_settings['show_invoice_layout']))
 	<div class="col-md-4">
@@ -194,14 +217,19 @@
     @endif
     
 </div>
+</details>
+@endif
+</div>
 <!-- include module fields -->
 @if(!empty($pos_module_data))
     @foreach($pos_module_data as $key => $value)
         @if(!empty($value['view_path']))
             @includeIf($value['view_path'], ['view_data' => $value['view_data']])
         @endif
-    @endforeach
+@endforeach
 @endif
+<div class="simple-pos-panel">
+	<h2 class="simple-pos-page-heading">Articles de la vente</h2>
 <div class="row">
 	<div class="col-sm-12 pos_product_div">
 		<input type="hidden" name="sell_price_tax" id="sell_price_tax" value="{{$business_details->sell_price_tax}}">
@@ -215,7 +243,7 @@
 				$hide_tax = 'hide';
 			}
 		@endphp
-		<table class="table table-condensed table-bordered table-striped table-responsive" id="pos_table">
+		<table class="table table-condensed table-bordered table-responsive" id="pos_table">
 			<thead>
 				<tr>
 					<th class="tex-center tw-text-sm md:!tw-text-base tw-font-bold @if(!empty($pos_settings['inline_service_staff'])) col-md-3 @else col-md-4 @endif">	
@@ -241,4 +269,5 @@
 			<tbody></tbody>
 		</table>
 	</div>
+</div>
 </div>

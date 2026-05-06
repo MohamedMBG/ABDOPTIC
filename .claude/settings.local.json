@@ -1,3 +1,11 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__hostinger-mcp__VPS_getVirtualMachinesV1",
+      "mcp__hostinger-mcp__hosting_listWebsitesV1",
+      "Bash(where sshpass *)",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  },
   "enableAllProjectMcpServers": true
 }

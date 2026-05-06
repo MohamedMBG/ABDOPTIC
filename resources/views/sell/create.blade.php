@@ -22,7 +22,7 @@
     <h1 class="tw-text-xl md:tw-text-3xl tw-font-bold tw-text-black">{{$title}}</h1>
 </section>
 <!-- Main content -->
-<section class="content no-print">
+<section class="content no-print simple-sale-page">
 <input type="hidden" id="amount_rounding_method" value="{{$pos_settings['amount_rounding_method'] ?? ''}}">
 @if(!empty($pos_settings['allow_overselling']))
 	<input type="hidden" id="is_overselling_allowed">
@@ -64,10 +64,26 @@
 			@component('components.widget', ['class' => 'box-solid'])
 				{!! Form::hidden('location_id', !empty($default_location) ? $default_location->id : null , ['id' => 'location_id', 'data-receipt_printer_type' => !empty($default_location->receipt_printer_type) ? $default_location->receipt_printer_type : 'browser', 'data-default_payment_accounts' => !empty($default_location) ? $default_location->default_payment_accounts : '']); !!}
 
+				@php
+					$has_advanced_sale_fields = (!empty($price_groups) && count($price_groups) > 1)
+						|| (in_array('types_of_service', $enabled_modules) && !empty($types_of_service))
+						|| in_array('subscription', $enabled_modules)
+						|| !empty($commission_agent)
+						|| ($sale_type != 'sales_order')
+						|| !empty($custom_field_1_label ?? null)
+						|| !empty($custom_field_2_label ?? null)
+						|| !empty($custom_field_3_label ?? null)
+						|| !empty($custom_field_4_label ?? null);
+				@endphp
+
+				<details class="simple-sale-details simple-sale-advanced-box">
+					<summary>Parametres de vente</summary>
+					<p class="simple-sale-help">Reglez ici les options de paiement, prix et service seulement si besoin.</p>
 				@if(!empty($price_groups))
 					@if(count($price_groups) > 1)
-						<div class="col-sm-4">
+						<div class="col-sm-4 simple-sale-advanced-field">
 							<div class="form-group">
+								{!! Form::label('price_group', __('lang_v1.price_group') . ':', ['class' => 'simple-sale-label']) !!}
 								<div class="input-group">
 									<span class="input-group-addon">
 										<i class="fas fa-money-bill-alt"></i>
@@ -96,8 +112,9 @@
 				{!! Form::hidden('default_price_group', null, ['id' => 'default_price_group']) !!}
 
 				@if(in_array('types_of_service', $enabled_modules) && !empty($types_of_service))
-					<div class="col-md-4 col-sm-6">
+					<div class="col-md-4 col-sm-6 simple-sale-advanced-field">
 						<div class="form-group">
+							{!! Form::label('types_of_service_id', __('lang_v1.select_types_of_service') . ':', ['class' => 'simple-sale-label']) !!}
 							<div class="input-group">
 								<span class="input-group-addon">
 									<i class="fa fa-external-link-square-alt text-primary service_modal_btn"></i>
@@ -116,7 +133,7 @@
 				@endif
 				
 				@if(in_array('subscription', $enabled_modules))
-					<div class="col-md-4 pull-right col-sm-6">
+					<div class="col-md-4 pull-right col-sm-6 simple-sale-advanced-field">
 						<div class="checkbox">
 							<label>
 				              {!! Form::checkbox('is_recurring', 1, false, ['class' => 'input-icheck', 'id' => 'is_recurring']); !!} @lang('lang_v1.subscribe')?
@@ -125,9 +142,11 @@
 					</div>
 				@endif
 				<div class="clearfix"></div>
-				<div class="@if(!empty($commission_agent)) col-sm-3 @else col-sm-4 @endif">
+				</details>
+				<div class="col-sm-4">
 					<div class="form-group">
-						{!! Form::label('contact_id', __('contact.customer') . ':*') !!}
+						{!! Form::label('contact_id', __('contact.customer') . ':*', ['class' => 'simple-sale-label']) !!}
+						<p class="simple-sale-help">Choisissez le client pour remplir la vente plus rapidement.</p>
 						<div class="input-group">
 							<span class="input-group-addon">
 								<i class="fa fa-user"></i>
@@ -143,47 +162,38 @@
 							value="{{ $walk_in_customer['selling_price_group_id'] ?? ''}}" >
 							@endif
 							{!! Form::select('contact_id', 
-								[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Enter Customer name / phone', 'required']); !!}
+								[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Nom ou telephone du client', 'required']); !!}
 							<span class="input-group-btn">
 								<button type="button" class="btn btn-default bg-white btn-flat add_new_customer" data-name=""><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
 							</span>
 						</div>
 						<small class="text-danger hide contact_due_text"><strong>@lang('account.customer_due'):</strong> <span></span></small>
 					</div>
-					<small>
-					<strong>
-						@lang('lang_v1.billing_address'):
-					</strong>
-					<div id="billing_address_div">
-						{!! $walk_in_customer['contact_address'] ?? '' !!}
-					</div>
-					<br>
-					<strong>
-						@lang('lang_v1.shipping_address'):
-					</strong>
-					<div id="shipping_address_div">
-						{{$walk_in_customer['supplier_business_name'] ?? ''}},<br>
-						{{$walk_in_customer['name'] ?? ''}},<br>
-						{{$walk_in_customer['shipping_address'] ?? ''}}
-					</div>					
-					</small>
+					<details class="simple-sale-details">
+						<summary>Adresses du client</summary>
+						<div class="simple-sale-addresses">
+							<strong>@lang('lang_v1.billing_address'):</strong>
+							<div id="billing_address_div">
+								{!! $walk_in_customer['contact_address'] ?? '' !!}
+							</div>
+						</div>
+					</details>
 				</div>
 
-				<div class="col-md-3">
+				<details class="simple-sale-details simple-sale-advanced-box">
+					<summary>Paiement et options client</summary>
+					<p class="simple-sale-help">Affichez ces champs seulement si la vente a des conditions particulieres.</p>
+				<div class="col-md-4 simple-sale-advanced-field">
 		          <div class="form-group">
-		            <div class="multi-input">
+		          	{!! Form::label('pay_term_number', __('contact.pay_term') . ':', ['class' => 'simple-sale-label']) !!} @show_tooltip(__('tooltip.pay_term'))
+		            <div class="multi-input simple-sale-multi-input">
 		            @php
 						$is_pay_term_required = !empty($pos_settings['is_pay_term_required']);
+						$pay_term_type = !empty($walk_in_customer['pay_term_type']) ? $walk_in_customer['pay_term_type'] : 'months';
 					@endphp
-		              {!! Form::label('pay_term_number', __('contact.pay_term') . ':') !!} @show_tooltip(__('tooltip.pay_term'))
-		              <br/>
-		              {!! Form::number('pay_term_number', $walk_in_customer['pay_term_number'], ['class' => 'form-control width-40 pull-left', 'placeholder' => __('contact.pay_term'), 'required' => $is_pay_term_required]); !!}
-
-		              {!! Form::select('pay_term_type', 
-		              	['months' => __('lang_v1.months'), 
-		              		'days' => __('lang_v1.days')], 
-		              		$walk_in_customer['pay_term_type'], 
-		              	['class' => 'form-control width-60 pull-left','placeholder' => __('messages.please_select'), 'required' => $is_pay_term_required]); !!}
+		              {!! Form::number('pay_term_number', $walk_in_customer['pay_term_number'], ['class' => 'form-control simple-sale-pay-term-number', 'placeholder' => __('contact.pay_term'), 'required' => $is_pay_term_required]); !!}
+					  {!! Form::hidden('pay_term_type', 'months') !!}
+					  <div class="form-control simple-sale-pay-term-type simple-sale-readonly-field">Mois</div>
 		            </div>
 		          </div>
 		        </div>
@@ -195,17 +205,19 @@
 				@php
 					$is_commission_agent_required = !empty($pos_settings['is_commission_agent_required']);
 				@endphp
-				<div class="col-sm-3">
+				<div class="col-sm-3 simple-sale-advanced-field">
 					<div class="form-group">
-					{!! Form::label('commission_agent', __('lang_v1.commission_agent') . ':') !!}
+					{!! Form::label('commission_agent', __('lang_v1.commission_agent') . ':', ['class' => 'simple-sale-label']) !!}
 					{!! Form::select('commission_agent', 
 								$commission_agent, null, ['class' => 'form-control select2', 'id' => 'commission_agent', 'required' => $is_commission_agent_required]); !!}
 					</div>
 				</div>
 				@endif
-				<div class="@if(!empty($commission_agent)) col-sm-3 @else col-sm-4 @endif">
+				</details>
+				<div class="col-sm-4">
 					<div class="form-group">
-						{!! Form::label('transaction_date', __('sale.sale_date') . ':*') !!}
+						{!! Form::label('transaction_date', __('sale.sale_date') . ':*', ['class' => 'simple-sale-label']) !!}
+						<p class="simple-sale-help">Date de la vente. Ce champ reste visible en permanence.</p>
 						<div class="input-group">
 							<span class="input-group-addon">
 								<i class="fa fa-calendar"></i>
@@ -225,25 +237,30 @@
 						<input type="hidden" id="disable_qty_alert">
 					@endif
 				@else
-					<div class="@if(!empty($commission_agent)) col-sm-3 @else col-sm-4 @endif">
+					<div class="col-sm-4">
 						<div class="form-group">
-							{!! Form::label('status', __('sale.status') . ':*') !!}
+							{!! Form::label('status', __('sale.status') . ':*', ['class' => 'simple-sale-label']) !!}
+							<p class="simple-sale-help">Choisissez uniquement le statut final voulu pour cette vente.</p>
 							{!! Form::select('status', $statuses, null, ['class' => 'form-control select2', 'placeholder' => __('messages.please_select'), 'required']); !!}
 						</div>
 					</div>
 				@endif
+				<div class="clearfix"></div>
+				<details class="simple-sale-details simple-sale-advanced-box">
+					<summary>Options avancees</summary>
+					<p class="simple-sale-help">Ces champs sont secondaires. Ouvrez-les seulement si necessaire.</p>
 				@if($sale_type != 'sales_order')
-					<div class="col-sm-3">
+					<div class="col-sm-3 simple-sale-advanced-field">
 						<div class="form-group">
-							{!! Form::label('invoice_scheme_id', __('invoice.invoice_scheme') . ':') !!}
+							{!! Form::label('invoice_scheme_id', __('invoice.invoice_scheme') . ':', ['class' => 'simple-sale-label']) !!}
 							{!! Form::select('invoice_scheme_id', $invoice_schemes, $default_invoice_schemes->id, ['class' => 'form-control select2', 'placeholder' => __('messages.please_select')]); !!}
 						</div>
 					</div>
 				@endif
 					@can('edit_invoice_number')
-					<div class="col-sm-3">
+					<div class="col-sm-3 simple-sale-advanced-field">
 						<div class="form-group">
-							{!! Form::label('invoice_no', $sale_type == 'sales_order' ? __('restaurant.order_no') : __('sale.invoice_no') . ':') !!}
+							{!! Form::label('invoice_no', $sale_type == 'sales_order' ? __('restaurant.order_no') : __('sale.invoice_no') . ':', ['class' => 'simple-sale-label']) !!}
 							{!! Form::text('invoice_no', null, ['class' => 'form-control', 'placeholder' => $sale_type == 'sales_order' ? __('restaurant.order_no') : __('sale.invoice_no')]); !!}
 							<p class="help-block">@lang('lang_v1.keep_blank_to_autogenerate')</p>
 						</div>
@@ -275,9 +292,9 @@
 		        		}
 		        	@endphp
 
-		        	<div class="col-md-4">
+		        	<div class="col-md-4 simple-sale-advanced-field">
 				        <div class="form-group">
-				            {!! Form::label('custom_field_1', $label_1 ) !!}
+				            {!! Form::label('custom_field_1', $label_1, ['class' => 'simple-sale-label']) !!}
 				            {!! Form::text('custom_field_1', null, ['class' => 'form-control','placeholder' => $custom_field_1_label, 'required' => $is_custom_field_1_required]); !!}
 				        </div>
 				    </div>
@@ -290,9 +307,9 @@
 		        		}
 		        	@endphp
 
-		        	<div class="col-md-4">
+		        	<div class="col-md-4 simple-sale-advanced-field">
 				        <div class="form-group">
-				            {!! Form::label('custom_field_2', $label_2 ) !!}
+				            {!! Form::label('custom_field_2', $label_2, ['class' => 'simple-sale-label']) !!}
 				            {!! Form::text('custom_field_2', null, ['class' => 'form-control','placeholder' => $custom_field_2_label, 'required' => $is_custom_field_2_required]); !!}
 				        </div>
 				    </div>
@@ -305,9 +322,9 @@
 		        		}
 		        	@endphp
 
-		        	<div class="col-md-4">
+		        	<div class="col-md-4 simple-sale-advanced-field">
 				        <div class="form-group">
-				            {!! Form::label('custom_field_3', $label_3 ) !!}
+				            {!! Form::label('custom_field_3', $label_3, ['class' => 'simple-sale-label']) !!}
 				            {!! Form::text('custom_field_3', null, ['class' => 'form-control','placeholder' => $custom_field_3_label, 'required' => $is_custom_field_3_required]); !!}
 				        </div>
 				    </div>
@@ -320,16 +337,16 @@
 		        		}
 		        	@endphp
 
-		        	<div class="col-md-4">
+		        	<div class="col-md-4 simple-sale-advanced-field">
 				        <div class="form-group">
-				            {!! Form::label('custom_field_4', $label_4 ) !!}
+				            {!! Form::label('custom_field_4', $label_4, ['class' => 'simple-sale-label']) !!}
 				            {!! Form::text('custom_field_4', null, ['class' => 'form-control','placeholder' => $custom_field_4_label, 'required' => $is_custom_field_4_required]); !!}
 				        </div>
 				    </div>
 		        @endif
-		        <div class="col-sm-3">
+		        <div class="col-sm-3 simple-sale-advanced-field">
 	                <div class="form-group">
-	                    {!! Form::label('upload_document', __('purchase.attach_document') . ':') !!}
+	                    {!! Form::label('upload_document', __('purchase.attach_document') . ':', ['class' => 'simple-sale-label']) !!}
 	                    {!! Form::file('sell_document', ['id' => 'upload_document', 'accept' => implode(',', array_keys(config('constants.document_upload_mimes_types')))]); !!}
 	                    <p class="help-block">
 	                    	@lang('purchase.max_file_size', ['size' => (config('constants.document_size_limit') / 1000000)])
@@ -342,12 +359,13 @@
 		        @if((!empty($pos_settings['enable_sales_order']) && $sale_type != 'sales_order') || $is_order_request_enabled)
 					<div class="col-sm-3">
 						<div class="form-group">
-							{!! Form::label('sales_order_ids', __('lang_v1.sales_order').':') !!}
+							{!! Form::label('sales_order_ids', __('lang_v1.sales_order').':', ['class' => 'simple-sale-label']) !!}
 							{!! Form::select('sales_order_ids[]', [], null, ['class' => 'form-control select2', 'multiple', 'id' => 'sales_order_ids']); !!}
 						</div>
 					</div>
 					<div class="clearfix"></div>
 				@endif
+				</details>
 
 				<div class="row">
    
@@ -365,17 +383,60 @@
 			@component('components.widget', ['class' => 'box-solid'])
 				<div class="col-sm-10 col-sm-offset-1">
 					<div class="form-group">
+						{!! Form::label('search_product', __('sale.product') . ':', ['class' => 'simple-sale-label']) !!}
+						<p class="simple-sale-help">Tapez ou scannez un produit pour l'ajouter.</p>
 						<div class="input-group">
 							<div class="input-group-btn">
 								<button type="button" class="btn btn-default bg-white btn-flat" data-toggle="modal" data-target="#configure_search_modal" title="{{__('lang_v1.configure_product_search')}}"><i class="fas fa-search-plus"></i></button>
 							</div>
-							{!! Form::text('search_product', null, ['class' => 'form-control mousetrap', 'id' => 'search_product', 'placeholder' => __('lang_v1.search_product_placeholder'),
+							{!! Form::text('search_product', null, ['class' => 'form-control mousetrap', 'id' => 'search_product', 'placeholder' => 'Rechercher ou scanner un produit',
 							'disabled' => is_null($default_location)? true : false,
 							'autofocus' => is_null($default_location)? false : true,
 							]); !!}
 							<span class="input-group-btn">
 								<button type="button" class="btn btn-default bg-white btn-flat pos_add_quick_product" data-href="{{action([\App\Http\Controllers\ProductController::class, 'quickAdd'])}}" data-container=".quick_add_product_modal"><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
 							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12 simple-sale-product-browser">
+					<div class="simple-sale-product-browser-header">
+						<h3 class="simple-sale-subtitle">Produits existants</h3>
+						<p class="simple-sale-help">Cliquez sur un produit existant pour l'ajouter rapidement a la vente.</p>
+					</div>
+					<div class="row">
+						@if(!empty($categories))
+							<div class="col-sm-6">
+								<div class="form-group">
+									{!! Form::label('simple_sale_product_category', __('category.category') . ':', ['class' => 'simple-sale-label']) !!}
+									<select class="form-control select2" id="simple_sale_product_category">
+										<option value="all">@lang('lang_v1.all_category')</option>
+										@foreach($categories as $category)
+											<option value="{{$category['id']}}">{{$category['name']}}</option>
+											@if(!empty($category['sub_categories']))
+												@foreach($category['sub_categories'] as $sc)
+													<option value="{{$sc['id']}}">&nbsp;&nbsp;{{$sc['name']}}</option>
+												@endforeach
+											@endif
+										@endforeach
+									</select>
+								</div>
+							</div>
+						@endif
+						@if(!empty($brands))
+							<div class="col-sm-6">
+								<div class="form-group">
+									{!! Form::label('simple_sale_product_brand', __('brand.brands') . ':', ['class' => 'simple-sale-label']) !!}
+									{!! Form::select('simple_sale_product_brand', ['' => __('messages.all')] + $brands, null, ['id' => 'simple_sale_product_brand', 'class' => 'form-control select2', 'name' => null]) !!}
+								</div>
+							</div>
+						@endif
+					</div>
+					<input type="hidden" id="suggestion_page" value="1">
+					<div class="simple-sale-product-grid-wrap">
+						<div class="row eq-height-row" id="product_list_body"></div>
+						<div class="text-center" id="suggestion_page_loader" style="display: none;">
+							<i class="fa fa-spinner fa-spin fa-2x"></i>
 						</div>
 					</div>
 				</div>
@@ -543,156 +604,6 @@
 				<input type="hidden" name="is_direct_sale" value="1">
 			@endcomponent
 			@component('components.widget', ['class' => 'box-solid'])
-			<div class="col-md-4">
-				<div class="form-group">
-		            {!! Form::label('shipping_details', __('sale.shipping_details')) !!}
-		            {!! Form::textarea('shipping_details',null, ['class' => 'form-control','placeholder' => __('sale.shipping_details') ,'rows' => '3', 'cols'=>'30']); !!}
-		        </div>
-			</div>
-			<div class="col-md-4">
-				<div class="form-group">
-		            {!! Form::label('shipping_address', __('lang_v1.shipping_address')) !!}
-		            {!! Form::textarea('shipping_address',null, ['class' => 'form-control','placeholder' => __('lang_v1.shipping_address') ,'rows' => '3', 'cols'=>'30']); !!}
-		        </div>
-			</div>
-			<div class="col-md-4">
-				<div class="form-group">
-					{!!Form::label('shipping_charges', __('sale.shipping_charges'))!!}
-					<div class="input-group">
-					<span class="input-group-addon">
-					<i class="fa fa-info"></i>
-					</span>
-					{!!Form::text('shipping_charges',@num_format(0.00),['class'=>'form-control input_number','placeholder'=> __('sale.shipping_charges')]);!!}
-					</div>
-				</div>
-			</div>
-			<div class="clearfix"></div>
-			<div class="col-md-4">
-				<div class="form-group">
-		            {!! Form::label('shipping_status', __('lang_v1.shipping_status')) !!}
-		            {!! Form::select('shipping_status',$shipping_statuses, null, ['class' => 'form-control','placeholder' => __('messages.please_select')]); !!}
-		        </div>
-			</div>
-			<div class="col-md-4">
-		        <div class="form-group">
-		            {!! Form::label('delivered_to', __('lang_v1.delivered_to') . ':' ) !!}
-		            {!! Form::text('delivered_to', null, ['class' => 'form-control','placeholder' => __('lang_v1.delivered_to')]); !!}
-		        </div>
-		    </div>
-			<div class="col-md-4">
-				<div class="form-group">
-					{!! Form::label('delivery_person', __('lang_v1.delivery_person') . ':' ) !!}
-					{!! Form::select('delivery_person', $users, null, ['class' => 'form-control select2','placeholder' => __('messages.please_select')]); !!}
-				</div>
-			</div>
-		    @php
-		        $shipping_custom_label_1 = !empty($custom_labels['shipping']['custom_field_1']) ? $custom_labels['shipping']['custom_field_1'] : '';
-
-		        $is_shipping_custom_field_1_required = !empty($custom_labels['shipping']['is_custom_field_1_required']) && $custom_labels['shipping']['is_custom_field_1_required'] == 1 ? true : false;
-
-		        $shipping_custom_label_2 = !empty($custom_labels['shipping']['custom_field_2']) ? $custom_labels['shipping']['custom_field_2'] : '';
-
-		        $is_shipping_custom_field_2_required = !empty($custom_labels['shipping']['is_custom_field_2_required']) && $custom_labels['shipping']['is_custom_field_2_required'] == 1 ? true : false;
-
-		        $shipping_custom_label_3 = !empty($custom_labels['shipping']['custom_field_3']) ? $custom_labels['shipping']['custom_field_3'] : '';
-		        
-		        $is_shipping_custom_field_3_required = !empty($custom_labels['shipping']['is_custom_field_3_required']) && $custom_labels['shipping']['is_custom_field_3_required'] == 1 ? true : false;
-
-		        $shipping_custom_label_4 = !empty($custom_labels['shipping']['custom_field_4']) ? $custom_labels['shipping']['custom_field_4'] : '';
-		        
-		        $is_shipping_custom_field_4_required = !empty($custom_labels['shipping']['is_custom_field_4_required']) && $custom_labels['shipping']['is_custom_field_4_required'] == 1 ? true : false;
-
-		        $shipping_custom_label_5 = !empty($custom_labels['shipping']['custom_field_5']) ? $custom_labels['shipping']['custom_field_5'] : '';
-		        
-		        $is_shipping_custom_field_5_required = !empty($custom_labels['shipping']['is_custom_field_5_required']) && $custom_labels['shipping']['is_custom_field_5_required'] == 1 ? true : false;
-	        @endphp
-
-	        @if(!empty($shipping_custom_label_1))
-	        	@php
-	        		$label_1 = $shipping_custom_label_1 . ':';
-	        		if($is_shipping_custom_field_1_required) {
-	        			$label_1 .= '*';
-	        		}
-	        	@endphp
-
-	        	<div class="col-md-4">
-			        <div class="form-group">
-			            {!! Form::label('shipping_custom_field_1', $label_1 ) !!}
-			            {!! Form::text('shipping_custom_field_1', !empty($walk_in_customer['shipping_custom_field_details']['shipping_custom_field_1']) ? $walk_in_customer['shipping_custom_field_details']['shipping_custom_field_1'] : null, ['class' => 'form-control','placeholder' => $shipping_custom_label_1, 'required' => $is_shipping_custom_field_1_required]); !!}
-			        </div>
-			    </div>
-	        @endif
-	        @if(!empty($shipping_custom_label_2))
-	        	@php
-	        		$label_2 = $shipping_custom_label_2 . ':';
-	        		if($is_shipping_custom_field_2_required) {
-	        			$label_2 .= '*';
-	        		}
-	        	@endphp
-
-	        	<div class="col-md-4">
-			        <div class="form-group">
-			            {!! Form::label('shipping_custom_field_2', $label_2 ) !!}
-			            {!! Form::text('shipping_custom_field_2', !empty($walk_in_customer['shipping_custom_field_details']['shipping_custom_field_2']) ? $walk_in_customer['shipping_custom_field_details']['shipping_custom_field_2'] : null, ['class' => 'form-control','placeholder' => $shipping_custom_label_2, 'required' => $is_shipping_custom_field_2_required]); !!}
-			        </div>
-			    </div>
-	        @endif
-	        @if(!empty($shipping_custom_label_3))
-	        	@php
-	        		$label_3 = $shipping_custom_label_3 . ':';
-	        		if($is_shipping_custom_field_3_required) {
-	        			$label_3 .= '*';
-	        		}
-	        	@endphp
-
-	        	<div class="col-md-4">
-			        <div class="form-group">
-			            {!! Form::label('shipping_custom_field_3', $label_3 ) !!}
-			            {!! Form::text('shipping_custom_field_3', !empty($walk_in_customer['shipping_custom_field_details']['shipping_custom_field_3']) ? $walk_in_customer['shipping_custom_field_details']['shipping_custom_field_3'] : null, ['class' => 'form-control','placeholder' => $shipping_custom_label_3, 'required' => $is_shipping_custom_field_3_required]); !!}
-			        </div>
-			    </div>
-	        @endif
-	        @if(!empty($shipping_custom_label_4))
-	        	@php
-	        		$label_4 = $shipping_custom_label_4 . ':';
-	        		if($is_shipping_custom_field_4_required) {
-	        			$label_4 .= '*';
-	        		}
-	        	@endphp
-
-	        	<div class="col-md-4">
-			        <div class="form-group">
-			            {!! Form::label('shipping_custom_field_4', $label_4 ) !!}
-			            {!! Form::text('shipping_custom_field_4', !empty($walk_in_customer['shipping_custom_field_details']['shipping_custom_field_4']) ? $walk_in_customer['shipping_custom_field_details']['shipping_custom_field_4'] : null, ['class' => 'form-control','placeholder' => $shipping_custom_label_4, 'required' => $is_shipping_custom_field_4_required]); !!}
-			        </div>
-			    </div>
-	        @endif
-	        @if(!empty($shipping_custom_label_5))
-	        	@php
-	        		$label_5 = $shipping_custom_label_5 . ':';
-	        		if($is_shipping_custom_field_5_required) {
-	        			$label_5 .= '*';
-	        		}
-	        	@endphp
-
-	        	<div class="col-md-4">
-			        <div class="form-group">
-			            {!! Form::label('shipping_custom_field_5', $label_5 ) !!}
-			            {!! Form::text('shipping_custom_field_5', !empty($walk_in_customer['shipping_custom_field_details']['shipping_custom_field_5']) ? $walk_in_customer['shipping_custom_field_details']['shipping_custom_field_5'] : null, ['class' => 'form-control','placeholder' => $shipping_custom_label_5, 'required' => $is_shipping_custom_field_5_required]); !!}
-			        </div>
-			    </div>
-	        @endif
-	        <div class="col-md-4">
-                <div class="form-group">
-                    {!! Form::label('shipping_documents', __('lang_v1.shipping_documents') . ':') !!}
-                    {!! Form::file('shipping_documents[]', ['id' => 'shipping_documents', 'multiple', 'accept' => implode(',', array_keys(config('constants.document_upload_mimes_types')))]); !!}
-                    <p class="help-block">
-                    	@lang('purchase.max_file_size', ['size' => (config('constants.document_size_limit') / 1000000)])
-                    	@includeIf('components.document_help_text')
-                    </p>
-                </div>
-            </div>
-	        <div class="clearfix"></div>
 	        <div class="col-md-12 text-center">
 				<button type="button" class="tw-dw-btn tw-dw-btn-primary tw-dw-btn-sm tw-text-white" id="toggle_additional_expense"> <i class="fas fa-plus"></i> @lang('lang_v1.add_additional_expenses') <i class="fas fa-chevron-down"></i></button>
 			</div>
@@ -922,6 +833,262 @@
 
 @stop
 
+@section('css')
+<style>
+	.simple-sale-page {
+		--sale-border: #d7dde5;
+		--sale-text: #1f2937;
+		--sale-muted: #6b7280;
+		--sale-bg: #f7f8fa;
+	}
+
+	.simple-sale-page.content {
+		padding-bottom: 48px;
+	}
+
+	.simple-sale-page .box.box-solid {
+		border: 1px solid var(--sale-border);
+		border-radius: 18px;
+		box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+		background: #fff;
+		margin-bottom: 24px;
+	}
+
+	.simple-sale-page .box-body {
+		padding: 24px 24px 20px;
+	}
+
+	.simple-sale-page .row {
+		margin-bottom: 12px;
+	}
+
+	.simple-sale-page .row:last-child {
+		margin-bottom: 0;
+	}
+
+	.simple-sale-page [class*="col-"] {
+		margin-bottom: 18px;
+	}
+
+	.simple-sale-page .form-group label,
+	.simple-sale-page .simple-sale-label {
+		display: block;
+		margin-bottom: 10px;
+		color: var(--sale-text);
+		font-size: 15px;
+		font-weight: 700;
+	}
+
+	.simple-sale-page .simple-sale-help {
+		margin: 0 0 12px;
+		color: var(--sale-muted);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	.simple-sale-page .simple-sale-subtitle {
+		margin: 0 0 6px;
+		color: var(--sale-text);
+		font-size: 18px;
+		font-weight: 700;
+	}
+
+	.simple-sale-page .form-control,
+	.simple-sale-page .input-group-addon,
+	.simple-sale-page .input-group-btn > .btn,
+	.simple-sale-page .select2-container--default .select2-selection--single {
+		min-height: 50px;
+		border-color: var(--sale-border);
+		box-shadow: none;
+	}
+
+	.simple-sale-page .form-control,
+	.simple-sale-page .select2-container--default .select2-selection--single {
+		font-size: 16px;
+		color: var(--sale-text);
+		border-radius: 12px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+
+	.simple-sale-page .input-group-addon,
+	.simple-sale-page .input-group-btn > .btn {
+		background: #fff;
+		color: var(--sale-muted);
+	}
+
+	.simple-sale-page .select2-container {
+		width: 100% !important;
+	}
+
+	.simple-sale-page .select2-container .select2-selection--single .select2-selection__rendered {
+		line-height: 48px;
+		padding-left: 16px;
+		padding-right: 36px;
+		font-size: 16px;
+		color: var(--sale-text);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.simple-sale-page .select2-container .select2-selection--single .select2-selection__arrow {
+		height: 48px;
+		right: 10px;
+	}
+
+	.simple-sale-page .simple-sale-multi-input {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.simple-sale-page .simple-sale-pay-term-number {
+		flex: 1 1 120px;
+		width: auto !important;
+	}
+
+	.simple-sale-page .simple-sale-pay-term-type {
+		flex: 1 1 180px;
+		width: auto !important;
+	}
+
+	.simple-sale-page .simple-sale-readonly-field {
+		display: flex;
+		align-items: center;
+		background: #f9fafb;
+		color: var(--sale-text);
+		font-weight: 600;
+		cursor: default;
+	}
+
+	.simple-sale-page .simple-sale-details,
+	.simple-sale-page .simple-sale-advanced-box {
+		margin-top: 18px;
+		padding-top: 14px;
+		border-top: 1px solid #eef2f7;
+	}
+
+	.simple-sale-page .simple-sale-details summary,
+	.simple-sale-page .simple-sale-advanced-box summary {
+		cursor: pointer;
+		font-weight: 700;
+		color: var(--sale-text);
+		list-style: none;
+	}
+
+	.simple-sale-page .simple-sale-details summary::-webkit-details-marker,
+	.simple-sale-page .simple-sale-advanced-box summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.simple-sale-page .simple-sale-details summary::before,
+	.simple-sale-page .simple-sale-advanced-box summary::before {
+		content: "+";
+		display: inline-flex;
+		width: 20px;
+		height: 20px;
+		align-items: center;
+		justify-content: center;
+		margin-right: 8px;
+		border: 1px solid var(--sale-border);
+		border-radius: 999px;
+		color: var(--sale-muted);
+		font-size: 13px;
+	}
+
+	.simple-sale-page .simple-sale-details[open] summary::before,
+	.simple-sale-page .simple-sale-advanced-box[open] summary::before {
+		content: "-";
+	}
+
+	.simple-sale-page .simple-sale-addresses {
+		margin-top: 16px;
+		color: var(--sale-text);
+		font-size: 14px;
+		line-height: 1.8;
+	}
+
+	.simple-sale-page #upload_document {
+		display: block;
+		width: 100%;
+		padding: 12px;
+		border: 1px dashed var(--sale-border);
+		border-radius: 12px;
+		background: var(--sale-bg);
+	}
+
+	.simple-sale-page .simple-sale-product-browser {
+		margin-top: 6px;
+		margin-bottom: 24px;
+		padding: 22px;
+		border: 1px solid #eef2f7;
+		border-radius: 16px;
+		background: #fbfcfd;
+	}
+
+	.simple-sale-page .simple-sale-product-browser-header {
+		margin-bottom: 18px;
+	}
+
+	.simple-sale-page .simple-sale-product-grid-wrap {
+		max-height: 420px;
+		overflow-y: auto;
+		padding: 6px 6px 0 0;
+	}
+
+	.simple-sale-page .pos_product_div {
+		margin-top: 8px;
+	}
+
+	.simple-sale-page #pos_table {
+		margin-top: 10px;
+	}
+
+	.simple-sale-page #pos_table th,
+	.simple-sale-page #pos_table td {
+		padding: 14px 10px;
+		vertical-align: middle;
+	}
+
+	.simple-sale-page .table-responsive + .table-responsive {
+		margin-top: 16px;
+	}
+
+	.simple-sale-page #additional_expenses_div {
+		margin-top: 18px;
+	}
+
+	.simple-sale-page .well {
+		padding: 18px;
+		border-radius: 14px;
+	}
+
+	.simple-sale-page .tw-dw-btn-lg,
+	.simple-sale-page .btn-lg {
+		padding: 12px 22px;
+	}
+
+	@media (max-width: 767px) {
+		.simple-sale-page .box-body {
+			padding: 18px 16px 14px;
+		}
+
+		.simple-sale-page .simple-sale-multi-input {
+			flex-direction: column;
+		}
+
+		.simple-sale-page [class*="col-"] {
+			margin-bottom: 14px;
+		}
+
+		.simple-sale-page .simple-sale-product-browser {
+			padding: 16px;
+		}
+	}
+</style>
+@endsection
+
 @section('javascript')
 	<script src="{{ asset('js/pos.js?v=' . $asset_v) }}"></script>
 	<script src="{{ asset('js/product.js?v=' . $asset_v) }}"></script>
@@ -944,14 +1111,6 @@
                 format: moment_date_format + ' ' + moment_time_format,
                 ignoreReadonly: true,
             });
-
-            $('#shipping_documents').fileinput({
-		        showUpload: false,
-		        showPreview: false,
-		        browseLabel: LANG.file_browse_label,
-		        removeLabel: LANG.remove,
-		    });
-
 		    $(document).on('change', '#prefer_payment_method', function(e) {
 			    var default_accounts = $('select#select_location_id').length ? 
 			                $('select#select_location_id')
@@ -1002,6 +1161,30 @@
 			if($('.payment_types_dropdown').length){
 				$('.payment_types_dropdown').change();
 			}
+
+			$(document).on('change', '#simple_sale_product_category', function() {
+				var category_id = $(this).val();
+				global_p_category_id = category_id === 'all' ? null : category_id;
+				$('input#suggestion_page').val(1);
+				get_product_suggestion_list(
+					global_p_category_id,
+					global_brand_id,
+					$('input#location_id').val(),
+					null
+				);
+			});
+
+			$(document).on('change', '#simple_sale_product_brand', function() {
+				var brand_id = $(this).val();
+				global_brand_id = brand_id ? brand_id : null;
+				$('input#suggestion_page').val(1);
+				get_product_suggestion_list(
+					global_p_category_id,
+					global_brand_id,
+					$('input#location_id').val(),
+					null
+				);
+			});
 
     	});
     </script>
