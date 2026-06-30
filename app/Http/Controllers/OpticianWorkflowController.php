@@ -10,11 +10,11 @@ class OpticianWorkflowController extends Controller
     protected function statuses()
     {
         return [
-            'prescription_received' => 'Prescription Received',
-            'lenses_ordered' => 'Lenses Ordered from Lab',
-            'in_assembly' => 'In Assembly',
-            'ready_for_pickup' => 'Ready for Pickup',
-            'delivered' => 'Delivered',
+            'prescription_received' => 'Ordonnance reçue',
+            'lenses_ordered' => 'Verres commandés',
+            'in_assembly' => 'Montage',
+            'ready_for_pickup' => 'Prêt pour retrait',
+            'delivered' => 'Livré',
         ];
     }
 

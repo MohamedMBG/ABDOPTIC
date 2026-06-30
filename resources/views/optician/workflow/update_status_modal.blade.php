@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content tw-rounded-xl tw-overflow-hidden tw-shadow-2xl">
-        <div class="modal-header tw-bg-indigo-600 tw-text-white tw-border-b-0 tw-p-5">
+        <div class="modal-header tw-text-white tw-border-b-0 tw-p-5" style="background:#1c1a17">
             <button type="button" class="close tw-text-white tw-opacity-80 hover:tw-opacity-100" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title tw-font-bold tw-text-lg"><i class="fas fa-tasks tw-mr-2"></i> Mise à jour du Statut ({{ $transaction->invoice_no }})</h4>
+            <h4 class="modal-title tw-font-bold tw-text-lg" style="font-family:'Fraunces',serif"><i class="fas fa-glasses tw-mr-2"></i> Mise à jour du Statut <span style="opacity:.7">· {{ $transaction->invoice_no }}</span></h4>
         </div>
         
         {!! Form::open(['url' => action([\App\Http\Controllers\OpticianWorkflowController::class, 'updateStatus'], [$transaction->id]), 'method' => 'POST', 'id' => 'update_optician_status_form']) !!}
@@ -66,7 +66,7 @@
         </div>
         <div class="modal-footer tw-bg-gray-50 tw-border-t">
             <button type="button" class="btn btn-default tw-rounded-lg tw-font-semibold" data-dismiss="modal">@lang('messages.close')</button>
-            <button type="submit" class="btn btn-primary tw-rounded-lg tw-font-semibold tw-px-6 tw-bg-indigo-600 hover:tw-bg-indigo-700 tw-border-none tw-shadow-md">@lang('messages.save')</button>
+            <button type="submit" class="btn tw-rounded-lg tw-font-semibold tw-px-6 tw-text-white tw-border-none tw-shadow-md" style="background:#1c1a17">@lang('messages.save')</button>
         </div>
         {!! Form::close() !!}
     </div>

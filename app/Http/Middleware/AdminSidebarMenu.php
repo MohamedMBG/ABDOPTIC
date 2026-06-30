@@ -430,7 +430,7 @@ class AdminSidebarMenu
                         $sub->url(
                             action([\App\Http\Controllers\OpticianWorkflowController::class, 'index']),
                             'Lab Workflow',
-                            ['icon' => '<i class="fas fa-microscope"></i>', 'active' => request()->segment(1) == 'optician-workflow']
+                            ['icon' => '', 'active' => request()->segment(1) == 'optician-workflow']
                         );
                     },
                     ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="tw-size-5 tw-shrink-0" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
