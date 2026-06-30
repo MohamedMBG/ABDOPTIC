@@ -950,7 +950,14 @@ class SellPosController extends Controller
             ? $prescription_notes
             : 'Prescription added from sale #' . $transaction->invoice_no . '.';
 
-        Prescription::create($prescription_data);
+        $prescription = Prescription::create($prescription_data);
+
+        // Link prescription to the sale so it shows in the optician workflow.
+        $transaction->prescription_id = $prescription->id;
+        if (empty($transaction->optician_status)) {
+            $transaction->optician_status = 'prescription_received';
+        }
+        $transaction->save();
     }
 
     /**

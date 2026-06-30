@@ -180,9 +180,9 @@ class ImportSalesController extends Controller
             //Remove header row
             unset($parsed_array[0]);
             $formatted_sales_data = $this->__formatSaleData($parsed_array, $import_fields, $group_by);
-            //Set maximum php execution time
-            ini_set('max_execution_time', 0);
-            ini_set('memory_limit', -1);
+            //Bounded limits for this import request only (not unlimited).
+            ini_set('max_execution_time', 600);
+            ini_set('memory_limit', '512M');
 
             $this->__importSales($formatted_sales_data, $business_id, $location_id);
 

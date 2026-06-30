@@ -146,7 +146,7 @@ $(document).ready( function(){
             if (confirm) {
                 var url = $(this).attr('href');
                 $.ajax({
-                    method: 'GET',
+                    method: 'POST',
                     url: url,
                     dataType: 'json',
                     success: function(result) {

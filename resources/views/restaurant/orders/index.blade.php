@@ -77,7 +77,7 @@
                         var _this = $(this);
                         var href = _this.data('href');
                         $.ajax({
-                            method: "GET",
+                            method: "POST",
                             url: href,
                             dataType: "json",
                             success: function(result){
@@ -104,7 +104,7 @@
                         var _this = $(this);
                         var href = _this.attr('href');
                         $.ajax({
-                            method: "GET",
+                            method: "POST",
                             url: href,
                             dataType: "json",
                             success: function(result){

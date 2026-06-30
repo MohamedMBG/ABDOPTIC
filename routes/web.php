@@ -177,9 +177,9 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/products/download-excel', [ProductController::class, 'downloadExcel']);
 
     Route::get('/products/stock-history/{id}', [ProductController::class, 'productStockHistory']);
-    Route::get('/delete-media/{media_id}', [ProductController::class, 'deleteMedia']);
+    Route::delete('/delete-media/{media_id}', [ProductController::class, 'deleteMedia']);
     Route::post('/products/mass-deactivate', [ProductController::class, 'massDeactivate']);
-    Route::get('/products/activate/{id}', [ProductController::class, 'activate']);
+    Route::post('/products/activate/{id}', [ProductController::class, 'activate']);
     Route::get('/products/view-product-group-price/{id}', [ProductController::class, 'viewGroupPrice']);
     Route::get('/products/add-selling-prices/{id}', [ProductController::class, 'addSellingPrices']);
     Route::post('/products/save-selling-prices', [ProductController::class, 'saveSellingPrices']);
@@ -206,19 +206,19 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::post('/products/toggle-woocommerce-sync', [ProductController::class, 'toggleWooCommerceSync']);
 
     Route::resource('products', ProductController::class);
-    Route::get('/toggle-subscription/{id}', 'SellPosController@toggleRecurringInvoices');
+    Route::post('/toggle-subscription/{id}', 'SellPosController@toggleRecurringInvoices');
     Route::post('/sells/pos/get-types-of-service-details', 'SellPosController@getTypesOfServiceDetails');
     Route::get('/sells/subscriptions', 'SellPosController@listSubscriptions');
     Route::get('/sells/duplicate/{id}', 'SellController@duplicateSell');
     Route::get('/sells/drafts', 'SellController@getDrafts');
-    Route::get('/sells/convert-to-draft/{id}', 'SellPosController@convertToInvoice');
-    Route::get('/toggle-subscription/{id}', [SellPosController::class, 'toggleRecurringInvoices']);
+    Route::post('/sells/convert-to-draft/{id}', 'SellPosController@convertToInvoice');
+    Route::post('/toggle-subscription/{id}', [SellPosController::class, 'toggleRecurringInvoices']);
     Route::post('/sells/pos/get-types-of-service-details', [SellPosController::class, 'getTypesOfServiceDetails']);
     Route::get('/sells/subscriptions', [SellPosController::class, 'listSubscriptions']);
     Route::get('/sells/duplicate/{id}', [SellController::class, 'duplicateSell']);
     Route::get('/sells/drafts', [SellController::class, 'getDrafts']);
-    Route::get('/sells/convert-to-draft/{id}', [SellPosController::class, 'convertToInvoice']);
-    Route::get('/sells/convert-to-proforma/{id}', [SellPosController::class, 'convertToProforma']);
+    Route::post('/sells/convert-to-draft/{id}', [SellPosController::class, 'convertToInvoice']);
+    Route::post('/sells/convert-to-proforma/{id}', [SellPosController::class, 'convertToProforma']);
     Route::get('/sells/quotations', [SellController::class, 'getQuotations']);
     Route::get('/sells/draft-dt', [SellController::class, 'getDraftDatables']);
     Route::resource('sells', SellController::class)->except(['show']);
@@ -228,13 +228,18 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::post('/import-sales', [ImportSalesController::class, 'import']);
     Route::get('/revert-sale-import/{batch}', [ImportSalesController::class, 'revertSaleImport']);
 
+    // Premium barcode-scan POS (reuses the existing sell/stock engine).
+    Route::get('/pos/scan', [\App\Http\Controllers\BarcodeScanController::class, 'index'])->name('pos.scan');
+    Route::get('/pos/scan/lookup', [\App\Http\Controllers\BarcodeScanController::class, 'lookup'])->name('pos.scan.lookup');
+    Route::post('/pos/scan/checkout', [\App\Http\Controllers\BarcodeScanController::class, 'checkout'])->name('pos.scan.checkout');
+
     Route::get('/sells/pos/get_product_row/{variation_id}/{location_id}', [SellPosController::class, 'getProductRow']);
     Route::post('/sells/pos/get_payment_row', [SellPosController::class, 'getPaymentRow']);
     Route::post('/sells/pos/get-reward-details', [SellPosController::class, 'getRewardDetails']);
     Route::get('/sells/pos/get-recent-transactions', [SellPosController::class, 'getRecentTransactions']);
     Route::get('/sells/pos/get-product-suggestion', [SellPosController::class, 'getProductSuggestion']);
     Route::get('/sells/pos/get-featured-products/{location_id}', [SellPosController::class, 'getFeaturedProducts']);
-    Route::get('/reset-mapping', [SellController::class, 'resetMapping']);
+    Route::post('/reset-mapping', [SellController::class, 'resetMapping']);
 
     Route::resource('pos', SellPosController::class);
 
@@ -388,7 +393,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
 
     //Backup
     Route::get('backup/download/{file_name}', [BackUpController::class, 'download']);
-    Route::get('backup/{id}/delete', [BackUpController::class, 'delete'])->name('delete_backup');
+    Route::delete('backup/{id}/delete', [BackUpController::class, 'delete'])->name('delete_backup');
     Route::resource('backup', BackUpController::class)->only('index', 'create', 'store');
 
     Route::get('selling-price-group/activate-deactivate/{id}', [SellingPriceGroupController::class, 'activateDeactivate']);
@@ -420,9 +425,9 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         Route::post('/fund-transfer', [AccountController::class, 'postFundTransfer']);
         Route::get('/deposit/{id}', [AccountController::class, 'getDeposit']);
         Route::post('/deposit', [AccountController::class, 'postDeposit']);
-        Route::get('/close/{id}', [AccountController::class, 'close']);
-        Route::get('/activate/{id}', [AccountController::class, 'activate']);
-        Route::get('/delete-account-transaction/{id}', [AccountController::class, 'destroyAccountTransaction']);
+        Route::post('/close/{id}', [AccountController::class, 'close']);
+        Route::post('/activate/{id}', [AccountController::class, 'activate']);
+        Route::delete('/delete-account-transaction/{id}', [AccountController::class, 'destroyAccountTransaction']);
         Route::get('/edit-account-transaction/{id}', [AccountController::class, 'editAccountTransaction']);
         Route::post('/update-account-transaction/{id}', [AccountController::class, 'updateAccountTransaction']);
         Route::get('/get-account-balance/{id}', [AccountController::class, 'getAccountBalance']);
@@ -449,15 +454,15 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         Route::get('/add-selected-modifiers', [Restaurant\ProductModifierSetController::class, 'add_selected_modifiers']);
 
         Route::get('/kitchen', [Restaurant\KitchenController::class, 'index']);
-        Route::get('/kitchen/mark-as-cooked/{id}', [Restaurant\KitchenController::class, 'markAsCooked']);
+        Route::post('/kitchen/mark-as-cooked/{id}', [Restaurant\KitchenController::class, 'markAsCooked']);
         Route::post('/refresh-orders-list', [Restaurant\KitchenController::class, 'refreshOrdersList']);
         Route::post('/refresh-line-orders-list', [Restaurant\KitchenController::class, 'refreshLineOrdersList']);
 
         Route::get('/orders', [Restaurant\OrderController::class, 'index']);
-        Route::get('/orders/mark-as-served/{id}', [Restaurant\OrderController::class, 'markAsServed']);
+        Route::post('/orders/mark-as-served/{id}', [Restaurant\OrderController::class, 'markAsServed']);
         Route::get('/data/get-pos-details', [Restaurant\DataController::class, 'getPosDetails']);
         Route::get('/data/check-staff-pin', [Restaurant\DataController::class, 'checkStaffPin']);
-        Route::get('/orders/mark-line-order-as-served/{id}', [Restaurant\OrderController::class, 'markLineOrderAsServed']);
+        Route::post('/orders/mark-line-order-as-served/{id}', [Restaurant\OrderController::class, 'markLineOrderAsServed']);
         Route::get('/print-line-order', [Restaurant\OrderController::class, 'printLineOrder']);
     });
 
@@ -473,7 +478,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::delete('manage-modules/destroy/{module_name}', [Install\ModulesController::class, 'destroy']);
     Route::resource('manage-modules', Install\ModulesController::class)
         ->only(['index', 'update']);
-    Route::get('regenerate', [Install\ModulesController::class, 'regenerate']);
+    Route::post('regenerate', [Install\ModulesController::class, 'regenerate']);
 
     Route::resource('warranties', WarrantyController::class);
 

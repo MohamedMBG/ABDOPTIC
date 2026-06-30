@@ -18,10 +18,13 @@
         @lang('lang_v1.upload_module')
     </button>
 
-    <a class="tw-dw-btn tw-dw-btn-primary tw-text-white tw-dw-btn-sm pull-right tw-mt-4" href="{{action([\App\Http\Controllers\Install\ModulesController::class, 'regenerate'])}}">
-        <i class="fas fa-tools"></i>
-        Regenerate @show_tooltip("<br/>1. Regenerate/publish modules css/js to fix not found issue. <br/> 2. Publish api module oauth files")
-    </a>
+    <form action="{{action([\App\Http\Controllers\Install\ModulesController::class, 'regenerate'])}}" method="POST" class="pull-right tw-mt-4" style="display:inline-block;">
+        @csrf
+        <button type="submit" class="tw-dw-btn tw-dw-btn-primary tw-text-white tw-dw-btn-sm">
+            <i class="fas fa-tools"></i>
+            Regenerate @show_tooltip("<br/>1. Regenerate/publish modules css/js to fix not found issue. <br/> 2. Publish api module oauth files")
+        </button>
+    </form>
 </section>
 
 <!-- Main content -->

@@ -44,6 +44,120 @@ class ImportProductsController extends Controller
     }
 
     /**
+     * Fetch a remote product image safely.
+     *
+     * Guards against SSRF and abuse when importing product images from a URL
+     * supplied in a CSV: only http/https is allowed, the resolved host must be
+     * a public IP (no localhost / private / link-local / reserved ranges), the
+     * request times out, the body is size-capped and the content type must be
+     * a real image.
+     *
+     * @param  string  $url
+     * @return array{contents:string, extension:string}|null  Null when unsafe/unreachable.
+     */
+    private function fetchRemoteImageSafely($url)
+    {
+        $max_bytes = 5 * 1024 * 1024; //5 MB
+        $allowed = [
+            'image/jpeg' => 'jpg',
+            'image/pjpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'image/bmp' => 'bmp',
+        ];
+
+        $parts = parse_url($url);
+        if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
+            return null;
+        }
+
+        //Scheme allowlist — blocks file://, ftp://, gopher://, php://, etc.
+        if (! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return null;
+        }
+
+        //Resolve host and reject any address in a private/reserved range (SSRF).
+        $host = $parts['host'];
+        $ips = [];
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips[] = $host;
+        } else {
+            $records = @dns_get_record($host, DNS_A + DNS_AAAA);
+            foreach ($records ?: [] as $r) {
+                if (! empty($r['ip'])) {
+                    $ips[] = $r['ip'];
+                }
+                if (! empty($r['ipv6'])) {
+                    $ips[] = $r['ipv6'];
+                }
+            }
+            if (empty($ips)) {
+                $resolved = gethostbyname($host);
+                if ($resolved && $resolved !== $host) {
+                    $ips[] = $resolved;
+                }
+            }
+        }
+
+        if (empty($ips)) {
+            return null;
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return null;
+            }
+        }
+
+        //Fetch with hard limits and no auto-following of redirects.
+        $ctx = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'timeout' => 10,
+                'follow_location' => 0,
+                'max_redirects' => 0,
+                'ignore_errors' => true,
+                'user_agent' => 'ABDOPTIC-import',
+            ],
+            'https' => [
+                'method' => 'GET',
+                'timeout' => 10,
+                'follow_location' => 0,
+                'max_redirects' => 0,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $stream = @fopen($url, 'rb', false, $ctx);
+        if ($stream === false) {
+            return null;
+        }
+
+        $contents = @stream_get_contents($stream, $max_bytes + 1);
+        $meta = stream_get_meta_data($stream);
+        fclose($stream);
+
+        if ($contents === false || strlen($contents) === 0 || strlen($contents) > $max_bytes) {
+            return null;
+        }
+
+        //Validate the bytes are really an image and match an allowed type.
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($contents);
+        if (! isset($allowed[$mime])) {
+            return null;
+        }
+
+        //getimagesizefromstring gives a second, independent confirmation.
+        if (@getimagesizefromstring($contents) === false) {
+            return null;
+        }
+
+        return ['contents' => $contents, 'extension' => $allowed[$mime]];
+    }
+
+    /**
      * Display import product screen.
      *
      * @return \Illuminate\Http\Response
@@ -87,9 +201,15 @@ class ImportProductsController extends Controller
                 return $notAllowed;
             }
 
-            //Set maximum php execution time
-            ini_set('max_execution_time', 0);
-            ini_set('memory_limit', -1);
+            //Validate the uploaded spreadsheet before doing any processing.
+            $request->validate([
+                'products_csv' => ['required', 'file', 'mimes:csv,txt,xls,xlsx', 'max:20480'],
+            ]);
+
+            //Imports can be large: raise limits to a sane, bounded value
+            //(scoped to this request only, not unlimited).
+            ini_set('max_execution_time', 600);
+            ini_set('memory_limit', '512M');
 
             if ($request->hasFile('products_csv')) {
                 $file = $request->file('products_csv');
@@ -147,15 +267,23 @@ class ImportProductsController extends Controller
                     $image_name = trim($value[29]);
                     if (! empty($image_name)) {
                         if (filter_var($image_name, FILTER_VALIDATE_URL)) {
-                            $source_image = file_get_contents($image_name);
+                            //Remote image: fetch only over http/https, block internal
+                            //hosts (SSRF), enforce timeout/size/content-type.
+                            $fetched = $this->fetchRemoteImageSafely($image_name);
 
-                            $path = parse_url($image_name, PHP_URL_PATH);
-                            $new_name = time().'_'.basename($path);
+                            if ($fetched === null) {
+                                $is_valid = false;
+                                $error_msg = "Invalid or unreachable image URL in row no. $row_no";
+                                break;
+                            }
+
+                            $new_name = time().'_'.bin2hex(random_bytes(8)).'.'.$fetched['extension'];
                             $dest_img = public_path().'/uploads/'.config('constants.product_img_path').'/'.$new_name;
-                            file_put_contents($dest_img, $source_image);
+                            file_put_contents($dest_img, $fetched['contents']);
                             $product_array['image'] = $new_name;
                         } else {
-                            $product_array['image'] = $image_name;
+                            //Local filename reference: keep only a sanitized basename.
+                            $product_array['image'] = basename(str_replace('\\', '/', $image_name));
                         }
                     } else {
                         $product_array['image'] = '';

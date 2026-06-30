@@ -70,9 +70,15 @@
                               <a class="tw-dw-btn tw-dw-btn-xs tw-dw-btn-outline tw-dw-btn-accent"
                                    href="{{action([\App\Http\Controllers\BackUpController::class, 'download'], [$backup['file_name']])}}"><i
                                         class="fa fa-cloud-download"></i> @lang('lang_v1.download')</a>
-                                <a class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error link_confirmation" data-button-type="delete"
-                                   href="{{ route('delete_backup', $backup['file_name']) }}"><i class="fa fa-trash-o"></i>
-                                    @lang('messages.delete') </a>
+                                <form action="{{ route('delete_backup', $backup['file_name']) }}" method="POST"
+                                      style="display:inline-block;"
+                                      onsubmit="return confirm('Are you sure?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error">
+                                        <i class="fa fa-trash-o"></i> @lang('messages.delete')
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

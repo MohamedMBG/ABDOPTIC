@@ -2761,6 +2761,7 @@ $(document).on('click', '.delete-media', function () {
             var tr = $(this).closest('tr');
             $.ajax({
                 url: url,
+                type: 'DELETE',
                 dataType: 'json',
                 success: function(result) {
                     if (result.success == true) {

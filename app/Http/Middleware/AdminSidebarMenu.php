@@ -334,6 +334,13 @@ class AdminSidebarMenu
                                     __('sale.pos_sale'),
                                     ['icon' => '', 'active' => request()->segment(1) == 'pos' && request()->segment(2) == 'create']
                                 );
+
+                                // Premium barcode-scan POS.
+                                $sub->url(
+                                    action([\App\Http\Controllers\BarcodeScanController::class, 'index']),
+                                    'Scan POS',
+                                    ['icon' => '', 'active' => request()->is('pos/scan')]
+                                );
                             }
                         }
 

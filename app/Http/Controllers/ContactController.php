@@ -625,10 +625,12 @@ class ContactController extends Controller
     if ($request->hasFile('image')) {
         try {
             $image = $request->file('image');
-            
-            // Sanitize filename
-            $image_name = time() . '_' . preg_replace('/[^a-zA-Z0-9.]/', '_', $image->getClientOriginalName());
-            
+
+            // Build a safe filename; force the extension from the validated image
+            // type (validated above) rather than trusting the client-supplied name.
+            $safe_ext = $image->extension() ?: 'jpg';
+            $image_name = time() . '_' . bin2hex(random_bytes(8)) . '.' . $safe_ext;
+
             // Save to public/storage/contacts
             $path = $image->storeAs('contacts', $image_name, 'public');
             
@@ -918,8 +920,13 @@ class ContactController extends Controller
             // Handle Image Upload
             if ($request->hasFile('image')) {
                 try {
+                    // Reject anything that is not a small real image (blocks .php etc.).
+                    $request->validate([
+                        'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                    ]);
+
                     $image = $request->file('image');
-                    
+
                     // Delete old image if exists
                     if (!empty($contact->image)) {
                         $old_image_path = public_path('storage/' . $contact->image);
@@ -927,10 +934,12 @@ class ContactController extends Controller
                             unlink($old_image_path);
                         }
                     }
-                    
-                    // Sanitize filename
-                    $image_name = time() . '_' . preg_replace('/[^a-zA-Z0-9.]/', '_', $image->getClientOriginalName());
-                    
+
+                    // Build a safe filename; force the extension from the validated
+                    // image type rather than trusting the client-supplied name.
+                    $safe_ext = $image->extension() ?: 'jpg';
+                    $image_name = time() . '_' . bin2hex(random_bytes(8)) . '.' . $safe_ext;
+
                     // Save to public/storage/contacts
                     $path = $image->storeAs('contacts', $image_name, 'public');
                     
@@ -1240,8 +1249,13 @@ class ContactController extends Controller
                 return $notAllowed;
             }
 
-            //Set maximum php execution time
-            ini_set('max_execution_time', 0);
+            //Validate the uploaded spreadsheet before processing.
+            $request->validate([
+                'contacts_csv' => ['required', 'file', 'mimes:csv,txt,xls,xlsx', 'max:20480'],
+            ]);
+
+            //Imports can be large: bounded limit, scoped to this request only.
+            ini_set('max_execution_time', 600);
 
             if ($request->hasFile('contacts_csv')) {
                 $file = $request->file('contacts_csv');
@@ -1489,7 +1503,7 @@ class ContactController extends Controller
         $format = request()->format;
         $location_id = request()->location_id;
 
-        $contact = Contact::find($contact_id);
+        $contact = Contact::where('business_id', $business_id)->findOrFail($contact_id);
 
         $is_selected_contacts = User::isSelectedContacts(auth()->user()->id);
         $user_contacts = [];

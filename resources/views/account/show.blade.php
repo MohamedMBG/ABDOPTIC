@@ -234,6 +234,7 @@
                 var href = $(this).data('href');
                 $.ajax({
                     url: href,
+                    type: "DELETE",
                     dataType: "json",
                     success: function(result){
                         if(result.success === true){

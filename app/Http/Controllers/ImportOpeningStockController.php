@@ -79,9 +79,9 @@ class ImportOpeningStockController extends Controller
                 return $notAllowed;
             }
 
-            //Set maximum php execution time
-            ini_set('max_execution_time', 0);
-            ini_set('memory_limit', -1);
+            //Bounded limits for this import request only (not unlimited).
+            ini_set('max_execution_time', 600);
+            ini_set('memory_limit', '512M');
 
             if ($request->hasFile('products_csv')) {
                 $file = $request->file('products_csv');

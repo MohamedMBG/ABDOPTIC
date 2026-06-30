@@ -59,4 +59,48 @@ class SmokeRoutesTest extends TestCase
 
         $response->assertStatus(405);
     }
+
+    /**
+     * State-changing endpoints must no longer be reachable with GET.
+     * 405 (Method Not Allowed) is resolved at the routing layer, before the
+     * auth middleware runs, so these assertions hold without a logged-in user.
+     *
+     * @dataProvider mutatingGetRoutes
+     */
+    public function test_state_changing_routes_reject_get($uri)
+    {
+        $response = $this->get($uri);
+
+        $response->assertStatus(405);
+    }
+
+    public static function mutatingGetRoutes()
+    {
+        return [
+            'delete media' => ['/delete-media/1'],
+            'activate product' => ['/products/activate/1'],
+            'convert to draft' => ['/sells/convert-to-draft/1'],
+            'convert to proforma' => ['/sells/convert-to-proforma/1'],
+            'toggle subscription' => ['/toggle-subscription/1'],
+            'reset mapping' => ['/reset-mapping'],
+            'delete backup' => ['/backup/1/delete'],
+            'close account' => ['/account/close/1'],
+            'activate account' => ['/account/activate/1'],
+            'delete account transaction' => ['/account/delete-account-transaction/1'],
+            'regenerate modules' => ['/regenerate'],
+            'upload module' => ['/upload-module'],
+        ];
+    }
+
+    public function test_module_upload_route_is_post_only()
+    {
+        $route = app('router')->getRoutes()->match(
+            \Illuminate\Http\Request::create('/upload-module', 'POST')
+        );
+
+        $this->assertSame(
+            'App\Http\Controllers\Install\ModulesController@uploadModule',
+            $route->getActionName()
+        );
+    }
 }

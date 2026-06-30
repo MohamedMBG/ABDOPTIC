@@ -237,23 +237,41 @@ class ModulesController extends Controller
 
     /**
      * Upload the module.
+     *
+     * Uploading a module ZIP means dropping arbitrary PHP into the application,
+     * so this endpoint is treated as privileged: it requires the same
+     * `manage_modules` permission as the other actions, strictly validates the
+     * uploaded archive and refuses any entry that would escape the Modules
+     * directory (Zip-Slip / path traversal) before extracting anything.
      */
     public function uploadModule(Request $request)
     {
+        if (! auth()->user()->can('manage_modules')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $notAllowed = $this->moduleUtil->notAllowedInDemo();
         if (! empty($notAllowed)) {
             return $notAllowed;
         }
 
+        //Validate: must be a real .zip, recognised as a zip archive, capped at 50 MB.
+        $request->validate([
+            'module' => ['required', 'file', 'mimes:zip', 'mimetypes:application/zip,application/x-zip-compressed,multipart/x-zip', 'max:51200'],
+        ]);
+
         try {
-
-            //get zipped file
             $module = $request->file('module');
-            $module_name = $module->getClientOriginalName();
-            $module_name = str_replace('.zip', '', $module_name);
 
-            //check if uploaded file is valid or not and and if not redirect back
-            if ($module->getMimeType() != 'application/zip') {
+            //Resolve the absolute target directory once so we can compare against it.
+            $path = base_path('Modules');
+            if (! is_dir($path)) {
+                mkdir($path, 0755, true);
+            }
+            $real_base = realpath($path);
+
+            $zip = new ZipArchive();
+            if ($zip->open($module->getRealPath()) !== true) {
                 $output = ['success' => false,
                     'msg' => __('lang_v1.pls_upload_valid_zip_file'),
                 ];
@@ -261,37 +279,89 @@ class ModulesController extends Controller
                 return redirect()->back()->with(['status' => $output]);
             }
 
-            //check if 'Modules' folder exist or not, if not exist create
-            $path = '../Modules';
-            if (! is_dir($path)) {
-                mkdir($path, 0777, true);
+            //Zip-Slip guard: inspect every entry before extracting any of them.
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $entry = $zip->getNameIndex($i);
+
+                if (self::isUnsafeZipEntry($entry, $real_base)) {
+                    $zip->close();
+
+                    $output = ['success' => false,
+                        'msg' => __('lang_v1.pls_upload_valid_zip_file'),
+                    ];
+
+                    return redirect()->back()->with(['status' => $output]);
+                }
             }
 
-            //extract the zipped file in given path
-            $zip = new ZipArchive();
-            if ($zip->open($module) === true) {
-                $zip->extractTo($path.'/');
-                $zip->close();
-
-                //Needs improvement
-
-                // if(!(file_exists($path . '/' . $module_name . '/composer.json')
-                //     && file_exists($path . '/' . $module_name . '/module.json')
-                //     && file_exists($path . '/' . $module_name . '/Config/config.php'))){
-                //         \File::deleteDirectory($path . '/' . $module_name);
-                // }
-            }
+            $zip->extractTo($path.'/');
+            $zip->close();
 
             $output = ['success' => true,
                 'msg' => __('lang_v1.success'),
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $output = ['success' => false,
                 'msg' => __('messages.something_went_wrong'),
             ];
         }
 
         return redirect()->back()->with(['status' => $output]);
+    }
+
+    /**
+     * Decide whether a ZIP entry name is unsafe to extract.
+     *
+     * Rejects absolute paths, parent-directory traversal (Zip-Slip), null bytes
+     * and any entry whose resolved destination would escape $base_dir.
+     *
+     * @param  string|false  $entry     Raw entry name from ZipArchive::getNameIndex().
+     * @param  string|null   $base_dir  Absolute path of the extraction target.
+     * @return bool                     True when the entry must be refused.
+     */
+    public static function isUnsafeZipEntry($entry, $base_dir = null)
+    {
+        if (! is_string($entry) || $entry === '') {
+            return true;
+        }
+
+        $normalized = str_replace('\\', '/', $entry);
+
+        if (strpos($normalized, "\0") !== false
+            || strpos($normalized, '../') !== false
+            || strpos($normalized, '/..') !== false
+            || $normalized === '..'
+            || preg_match('#^([a-zA-Z]:)?/#', $normalized) === 1) {
+            return true;
+        }
+
+        //Optional second check: the resolved destination must stay inside base.
+        if (! empty($base_dir)) {
+            $base = str_replace('\\', '/', rtrim($base_dir, '/\\'));
+            $target = $base.'/'.$normalized;
+
+            //Manually collapse the path (entries may not exist on disk yet).
+            $parts = [];
+            foreach (explode('/', $target) as $segment) {
+                if ($segment === '' || $segment === '.') {
+                    continue;
+                }
+                if ($segment === '..') {
+                    array_pop($parts);
+
+                    continue;
+                }
+                $parts[] = $segment;
+            }
+            $collapsed = implode('/', $parts);
+
+            $base_trim = ltrim($base, '/');
+            if (strpos($collapsed, $base_trim) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function __available_modules()

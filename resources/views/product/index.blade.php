@@ -515,7 +515,7 @@
                 e.preventDefault();
                 var href = $(this).attr('href');
                 $.ajax({
-                    method: "get",
+                    method: "post",
                     url: href,
                     dataType: "json",
                     success: function(result) {

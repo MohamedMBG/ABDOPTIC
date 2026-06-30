@@ -40,6 +40,11 @@ class OpticianWorkflowController extends Controller
                         $q->whereNotNull('prescription_id')
                           ->orWhereNotNull('optician_status');
                     })
+                    // Non-delivered only (null status = not started, keep it).
+                    ->where(function($q) {
+                        $q->whereNull('optician_status')
+                          ->orWhere('optician_status', '!=', 'delivered');
+                    })
                     ->select([
                         'id',
                         'business_id',

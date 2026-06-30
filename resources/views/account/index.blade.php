@@ -225,7 +225,7 @@
                         var url = $(this).data('url');
 
                         $.ajax({
-                            method: "get",
+                            method: "post",
                             url: url,
                             dataType: "json",
                             success: function(result) {
@@ -447,7 +447,7 @@
                 if (willActivate) {
                     var url = $(this).data('url');
                     $.ajax({
-                        method: "get",
+                        method: "post",
                         url: url,
                         dataType: "json",
                         success: function(result) {
