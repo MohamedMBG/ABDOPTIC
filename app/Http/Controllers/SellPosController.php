@@ -612,7 +612,7 @@ class SellPosController extends Controller
                             );
                         }
 
-                        if ($product['product_type'] == 'combo') {
+                        if (isset($product['product_type']) && $product['product_type'] == 'combo') {
                             //Decrease quantity of combo as well.
                             $this->productUtil
                                 ->decreaseProductQuantityCombo(

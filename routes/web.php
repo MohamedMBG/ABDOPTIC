@@ -206,12 +206,6 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::post('/products/toggle-woocommerce-sync', [ProductController::class, 'toggleWooCommerceSync']);
 
     Route::resource('products', ProductController::class);
-    Route::post('/toggle-subscription/{id}', 'SellPosController@toggleRecurringInvoices');
-    Route::post('/sells/pos/get-types-of-service-details', 'SellPosController@getTypesOfServiceDetails');
-    Route::get('/sells/subscriptions', 'SellPosController@listSubscriptions');
-    Route::get('/sells/duplicate/{id}', 'SellController@duplicateSell');
-    Route::get('/sells/drafts', 'SellController@getDrafts');
-    Route::post('/sells/convert-to-draft/{id}', 'SellPosController@convertToInvoice');
     Route::post('/toggle-subscription/{id}', [SellPosController::class, 'toggleRecurringInvoices']);
     Route::post('/sells/pos/get-types-of-service-details', [SellPosController::class, 'getTypesOfServiceDetails']);
     Route::get('/sells/subscriptions', [SellPosController::class, 'listSubscriptions']);
