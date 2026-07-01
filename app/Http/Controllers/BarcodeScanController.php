@@ -221,6 +221,15 @@ class BarcodeScanController extends Controller
             return response()->json(['success' => 0, 'msg' => 'Cart is empty'], 422);
         }
 
+        // Cash sale needs an open register, same gate as SellPosController. Else the cash
+        // taken never lands in a register -> Z-report / reconciliation hole.
+        if ($this->cashRegisterUtil->countOpenedRegister() == 0) {
+            return response()->json([
+                'success' => 0,
+                'msg' => 'No open cash register. Open a register before selling.',
+            ], 422);
+        }
+
         $allow_overselling = ! empty($request->session()->get('business.pos_settings')['allow_overselling']);
 
         try {
@@ -258,6 +267,10 @@ class BarcodeScanController extends Controller
                     }
                 }
 
+                // Per-unit tax = inc-tax price minus exclusive price. tax_id = product's
+                // tax group. Same values main POS records, so output-tax reports stay right.
+                $item_tax = (float) $variation->sell_price_inc_tax - (float) $variation->default_sell_price;
+
                 $products[] = [
                     'product_id' => $product->id,
                     'variation_id' => $variation->id,
@@ -266,8 +279,8 @@ class BarcodeScanController extends Controller
                     'quantity' => $qty,
                     'unit_price' => $variation->sell_price_inc_tax,
                     'unit_price_inc_tax' => $variation->sell_price_inc_tax,
-                    'item_tax' => 0,
-                    'tax_id' => null,
+                    'item_tax' => $item_tax,
+                    'tax_id' => $product->tax,
                     'base_unit_multiplier' => 1,
                     'sell_line_note' => '',
                 ];

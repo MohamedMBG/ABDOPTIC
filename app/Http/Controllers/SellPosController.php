@@ -732,7 +732,11 @@ class SellPosController extends Controller
 
                 $this->transactionUtil->activityLog($transaction, 'added');
 
-                $this->storePrescriptionFromSale($request, $transaction);
+                //Only finalised sales create a prescription — drafts/quotations/suspends
+                //must not populate the optician workflow board with unconfirmed quotes.
+                if ($input['status'] == 'final') {
+                    $this->storePrescriptionFromSale($request, $transaction);
+                }
 
                 DB::commit();
 
@@ -917,8 +921,8 @@ class SellPosController extends Controller
     protected function storePrescriptionFromSale(Request $request, Transaction $transaction): void
     {
         $prescription_data = $request->only([
-            'od_sphere', 'od_cylinder', 'od_axis', 'od_addition', 'od_pd',
-            'os_sphere', 'os_cylinder', 'os_axis', 'os_addition', 'os_pd',
+            'od_sphere', 'od_cylinder', 'od_axis', 'od_addition', 'od_prism', 'od_base', 'od_pd',
+            'os_sphere', 'os_cylinder', 'os_axis', 'os_addition', 'os_prism', 'os_base', 'os_pd',
         ]);
         $prescription_notes = $request->input('prescription_notes');
 
