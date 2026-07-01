@@ -351,7 +351,7 @@ class HomeController extends Controller
                     ->where('transactions.business_id', $business_id)
                     ->where('transactions.type', 'purchase')
                     ->where('transactions.payment_status', '!=', 'paid')
-                    ->whereRaw("DATEDIFF( DATE_ADD( transaction_date, INTERVAL IF(transactions.pay_term_type = 'days', transactions.pay_term_number, 30 * transactions.pay_term_number) DAY), '$today') <= 7");
+                    ->whereRaw("DATEDIFF( DATE_ADD( transaction_date, INTERVAL IF(transactions.pay_term_type = 'days', transactions.pay_term_number, 30 * transactions.pay_term_number) DAY), ?) <= 7", [$today]);
 
             //Check for permitted locations of a user
             $permitted_locations = auth()->user()->permitted_locations();
@@ -428,7 +428,7 @@ class HomeController extends Controller
                     ->where('transactions.payment_status', '!=', 'paid')
                     ->whereNotNull('transactions.pay_term_number')
                     ->whereNotNull('transactions.pay_term_type')
-                    ->whereRaw("DATEDIFF( DATE_ADD( transaction_date, INTERVAL IF(transactions.pay_term_type = 'days', transactions.pay_term_number, 30 * transactions.pay_term_number) DAY), '$today') <= 7");
+                    ->whereRaw("DATEDIFF( DATE_ADD( transaction_date, INTERVAL IF(transactions.pay_term_type = 'days', transactions.pay_term_number, 30 * transactions.pay_term_number) DAY), ?) <= 7", [$today]);
 
             //Check for permitted locations of a user
             $permitted_locations = auth()->user()->permitted_locations();

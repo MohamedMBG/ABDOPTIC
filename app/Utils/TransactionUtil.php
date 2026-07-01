@@ -743,6 +743,7 @@ class TransactionUtil extends Util
      */
     public function createOrUpdatePaymentLines($transaction, $payments, $business_id = null, $user_id = null, $uf_data = true)
     {
+        $payments = $payments ?? [];
         $payments_formatted = [];
         $edit_ids = [0];
         $account_transactions = [];
@@ -3983,11 +3984,11 @@ class TransactionUtil extends Util
             $next_day = \Carbon::createFromFormat('Y-m-d', $date)->addDay()->format('Y-m-d');
 
             $query->where(function ($query) use ($date, $next_day) {
-                $query->whereRaw("date(transaction_date) <= '$date'")
-                    ->orWhereRaw("date(transaction_date) = '$next_day' AND purchase.type='opening_stock' ");
+                $query->whereRaw('date(transaction_date) <= ?', [$date])
+                    ->orWhereRaw("date(transaction_date) = ? AND purchase.type='opening_stock' ", [$next_day]);
             });
         } else {
-            $query->whereRaw("date(transaction_date) <= '$date'");
+            $query->whereRaw('date(transaction_date) <= ?', [$date]);
         }
 
         $query->select(

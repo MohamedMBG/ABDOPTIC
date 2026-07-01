@@ -135,7 +135,7 @@ class InstallUtil extends Util
                 foreach ($product->product_variations as $product_variation) {
                     //Update Product variations
                     $variation_template = VariationTemplate::where('business_id', $product->business_id)
-                                    ->whereRaw('LOWER(name) = "'.strtolower($product_variation->name).'"')
+                                    ->whereRaw('LOWER(name) = ?', [strtolower($product_variation->name)])
                                     ->with(['values'])
                                     ->first();
 

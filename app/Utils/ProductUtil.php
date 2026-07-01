@@ -93,7 +93,7 @@ class ProductUtil extends Util
             if (empty($variation_template_id)) {
                 if ($variation_template_name != 'DUMMY') {
                     $variation_template = VariationTemplate::where('business_id', $business_id)
-                                                        ->whereRaw('LOWER(name)="'.strtolower($variation_template_name).'"')
+                                                        ->whereRaw('LOWER(name) = ?', [strtolower($variation_template_name)])
                                                         ->with(['values'])
                                                         ->first();
                     if (empty($variation_template)) {
@@ -144,7 +144,7 @@ class ProductUtil extends Util
                     } else {
                         if (! empty($variation_template)) {
                             $variation_value = VariationValueTemplate::where('variation_template_id', $variation_template->id)
-                                ->whereRaw('LOWER(name)="'.$variation_value_name.'"')
+                                ->whereRaw('LOWER(name) = ?', [strtolower($variation_value_name)])
                                 ->first();
                             if (empty($variation_value)) {
                                 $variation_value = VariationValueTemplate::create([
@@ -248,7 +248,7 @@ class ProductUtil extends Util
 
                     if (! empty($product_variation->variation_template_id)) {
                         $variation_value = VariationValueTemplate::where('variation_template_id', $product_variation->variation_template_id)
-                                ->whereRaw('LOWER(name)="'.$v['value'].'"')
+                                ->whereRaw('LOWER(name) = ?', [strtolower($v['value'])])
                                 ->first();
                         if (empty($variation_value)) {
                             $variation_value = VariationValueTemplate::create([
@@ -1264,7 +1264,7 @@ class ProductUtil extends Util
             $purchase_line->purchase_price = ($this->num_uf($data['purchase_price'], $currency_details) * $exchange_rate) / $multiplier;
             $purchase_line->purchase_price_inc_tax = ($this->num_uf($data['purchase_price_inc_tax'], $currency_details) * $exchange_rate) / $multiplier;
             $purchase_line->item_tax = ($this->num_uf($data['item_tax'], $currency_details) * $exchange_rate) / $multiplier;
-            $purchase_line->tax_id = $data['purchase_line_tax_id'];
+            $purchase_line->tax_id = $data['purchase_line_tax_id'] ?? null;
             $purchase_line->lot_number = ! empty($data['lot_number']) ? $data['lot_number'] : null;
             $purchase_line->mfg_date = ! empty($data['mfg_date']) ? $this->uf_date($data['mfg_date']) : null;
             $purchase_line->exp_date = ! empty($data['exp_date']) ? $this->uf_date($data['exp_date']) : null;
@@ -1577,8 +1577,13 @@ class ProductUtil extends Util
                             }
                         })
                             ->orWhere(function ($sub_q) use ($product) {
-                                $sub_q->whereRaw('(brand_id="'.$product->brand_id.'" AND category_id IS NULL)')
-                                ->orWhereRaw('(category_id="'.$product->category_id.'" AND brand_id IS NULL)');
+                                $sub_q->where(function ($query) use ($product) {
+                                    $query->where('brand_id', $product->brand_id)
+                                        ->whereNull('category_id');
+                                })->orWhere(function ($query) use ($product) {
+                                    $query->where('category_id', $product->category_id)
+                                        ->whereNull('brand_id');
+                                });
                             });
 
                         if (! empty($variation_id)) {
