@@ -90,13 +90,16 @@ class OpticianWorkflowController extends Controller
 
             // Forward-only pipeline: block regressing to an earlier stage (e.g. un-delivering).
             // Skipping stages forward is allowed; null current status = not started.
+            // $status is validated against $statuses above, so $new_index is always found.
+            // A current status missing from $statuses is a legacy/unknown value — allow it
+            // to move onto the known pipeline rather than locking the order forever.
             if (! empty($transaction->optician_status)) {
                 $current_index = array_search($transaction->optician_status, $statuses, true);
                 $new_index = array_search($status, $statuses, true);
-                if ($current_index !== false && $new_index !== false && $new_index < $current_index) {
+                if ($current_index !== false && $new_index < $current_index) {
                     return redirect()->back()->with('status', [
                         'success' => 0,
-                        'msg' => 'Cannot move an order back to an earlier stage.',
+                        'msg' => __('lang_v1.optician_status_no_regress'),
                     ]);
                 }
             }
