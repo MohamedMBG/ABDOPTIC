@@ -1364,4 +1364,5 @@ return [
     'in_stock' => 'en stock',
     'cogs' => 'COGS:',
     'cogs_help_text' => "Coût des biens vendus = Inventaire initial (stock d'ouverture) + achats − inventaire final (stock de clôture)",
+    'optician_status_no_regress' => "Impossible de faire reculer une commande à une étape antérieure.",
 ];
