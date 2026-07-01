@@ -1578,10 +1578,10 @@ class ProductUtil extends Util
                         })
                             ->orWhere(function ($sub_q) use ($product) {
                                 $sub_q->where(function ($query) use ($product) {
-                                    $query->where('brand_id', $product->brand_id)
+                                    $query->where('brand_id', '=', $product->brand_id ?? '')
                                         ->whereNull('category_id');
                                 })->orWhere(function ($query) use ($product) {
-                                    $query->where('category_id', $product->category_id)
+                                    $query->where('category_id', '=', $product->category_id ?? '')
                                         ->whereNull('brand_id');
                                 });
                             });
